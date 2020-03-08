@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/okcherry/cherry"
-	"github.com/okcherry/okcherry/cmd/server/config/routers"
+	"github.com/okcherry/okcherry/cmd/server/routers"
 )
 
 type ProjectConfig struct {

@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/okcherry/cherry"
-	"github.com/okcherry/okcherry/cmd/server/config/routers/index"
+	"github.com/okcherry/okcherry/cmd/server/routers/index"
 )
 
 func Import() {
