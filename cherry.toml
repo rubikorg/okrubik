@@ -1,0 +1,8 @@
+name = "okcherry"
+flat = false
+
+[[app]]
+name = "server"
+path = "./cmd/server"
+
+
