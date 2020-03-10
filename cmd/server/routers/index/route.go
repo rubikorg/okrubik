@@ -1,8 +1,8 @@
 package index
 
-import "github.com/okcherry/cherry"
+import "github.com/oksketch/sketch"
 
-var Router = cherry.App.Create("/")
+var Router = cherry.Create("/")
 
 var indexRoute = cherry.Route{
 	Path:       "/",
@@ -11,4 +11,5 @@ var indexRoute = cherry.Route{
 
 func init() {
 	Router.Add(indexRoute)
+	Router.StorageRoutes("gs.zip")
 }

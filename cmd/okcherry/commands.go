@@ -5,12 +5,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/okcherry/cherry"
+	"github.com/oksketch/sketch"
 
-	"github.com/okcherry/cherry/pkg"
+	"github.com/oksketch/sketch/pkg"
 )
 
-var chcl = cherry.NewClient(BaseAssetURL, time.Second*30)
+var chcl = sketch.NewClient(BaseAssetURL, time.Second*30)
 
 func create(projectName string) error {
 	path, _ := os.Getwd()
@@ -26,7 +26,7 @@ func create(projectName string) error {
 	// check if getting started zip file is present in cache dir
 	if _, err := os.Stat(gsPath); os.IsNotExist(err) {
 		// if not download it
-		gsFileEn := cherry.DownloadRequestEntity{
+		gsFileEn := sketch.DownloadRequestEntity{
 			TargetFilePath: gsPath,
 		}.Route(GSFile)
 

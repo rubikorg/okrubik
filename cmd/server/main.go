@@ -1,23 +1,20 @@
 package main
 
 import (
-	"github.com/okcherry/cherry"
-	"github.com/okcherry/okcherry/cmd/server/routers"
+	cfg "github.com/oksketch/oksketch/cmd/server/config"
+	"github.com/oksketch/oksketch/cmd/server/routers"
+	"github.com/oksketch/sketch"
 )
 
-type ProjectConfig struct {
-	Port string `toml:"port"`
-}
-
 func main() {
-	var config ProjectConfig
-	err := cherry.App.Load(&config)
+	var config cfg.ProjectConfig
+	err := sketch.Load(&config)
 
 	if err != nil {
 		panic(err)
 	}
 
 	routers.Import()
-	panic(cherry.App.Listen())
+	panic(sketch.Listen())
 
 }

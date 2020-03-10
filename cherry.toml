@@ -1,5 +1,9 @@
-name = "okcherry"
+name = "oksketch"
 flat = false
+
+[[app]]
+name = "cli"
+path = "./cmd/cli"
 
 [[app]]
 name = "server"

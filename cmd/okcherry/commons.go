@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/okcherry/cherry/pkg"
+	"github.com/oksketch/sketch/pkg"
 )
 
 const (
 	// BaseAssetURL is the base url for getting files neede for okcherry
-	BaseAssetURL = "https://cherry.ashishshekar.com/asset"
+	BaseAssetURL = "http://localhost:7000"
 	// GSFile is the getting started file path
 	GSFile = "/gs.zip"
 )
