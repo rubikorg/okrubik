@@ -7,6 +7,6 @@ import (
 
 func Import() {
 	// index
-	cherry.Use(index.Router)
+	sketch.Use(index.Router)
 
 }

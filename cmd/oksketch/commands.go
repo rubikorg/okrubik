@@ -40,7 +40,7 @@ func create(projectName string) error {
 	// unzip base template to project path
 	unzipFileFromCache(GSFile, projPath)
 
-	pkg.CherryMsg("Created cherry project " + projectName + ". Happy picking!")
+	pkg.SketchMsg("Created cherry project " + projectName + ". Happy picking!")
 
 	return nil
 }

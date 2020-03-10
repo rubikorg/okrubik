@@ -20,7 +20,7 @@ func main() {
 		switch mainCmd {
 		case "create":
 			if len(args) == 1 {
-				pkg.ErrorMsg("sketch needs a value for folder name after create command. Example: okcherry create helloworld.")
+				pkg.ErrorMsg("sketch needs a value for folder name after create command. Example: oksketch create helloworld.")
 				return
 			}
 			err := create(args[1])
@@ -29,19 +29,19 @@ func main() {
 			}
 			break
 		case "run":
-			var cherryConfig pkg.Config
+			var sketchConfig pkg.Config
 			pwd, _ := os.Getwd()
-			configPath := pwd + string(os.PathSeparator) + "cherry.toml"
-			_, err := toml.DecodeFile(configPath, &cherryConfig)
+			configPath := pwd + string(os.PathSeparator) + "sketch.toml"
+			_, err := toml.DecodeFile(configPath, &sketchConfig)
 			if err != nil {
 				pkg.ErrorMsg("Bad config. Raw: " + err.Error())
 				return
 			}
 
-			if len(cherryConfig.App) > 1 && len(args) == 1 {
+			if len(sketchConfig.App) > 1 && len(args) == 1 {
 				var appSlice []string
 				var lookup = make(map[string]int)
-				for i, app := range cherryConfig.App {
+				for i, app := range sketchConfig.App {
 					appSlice = append(appSlice, app.Name)
 					lookup[app.Name] = i
 				}
@@ -52,7 +52,7 @@ func main() {
 
 				_, _, _ = prompt.Run()
 				//in := lookup[result]
-				//cmd += cherryConfig.App[in].Path
+				//cmd += sketchConfig.App[in].Path
 				return
 			} else {
 

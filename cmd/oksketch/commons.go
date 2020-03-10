@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	// BaseAssetURL is the base url for getting files neede for okcherry
+	// BaseAssetURL is the base url for getting files neede for oksketch
 	BaseAssetURL = "http://localhost:7000"
 	// GSFile is the getting started file path
 	GSFile = "/gs.zip"

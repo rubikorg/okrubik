@@ -2,9 +2,9 @@ package index
 
 import "github.com/oksketch/sketch"
 
-var Router = cherry.Create("/")
+var Router = sketch.Create("/")
 
-var indexRoute = cherry.Route{
+var indexRoute = sketch.Route{
 	Path:       "/",
 	Controller: indexCtl,
 }
