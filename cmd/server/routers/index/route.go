@@ -1,10 +1,10 @@
 package index
 
-import "github.com/oksketch/sketch"
+import "github.com/rubikorg/rubik"
 
-var Router = sketch.Create("/")
+var Router = rubik.Create("/")
 
-var indexRoute = sketch.Route{
+var indexRoute = rubik.Route{
 	Path:       "/",
 	Controller: indexCtl,
 }

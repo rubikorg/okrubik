@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/oksketch/sketch/pkg"
+	"github.com/rubikorg/rubik/pkg"
 )
 
 const (
@@ -19,7 +19,7 @@ const (
 
 func getCachePath() string {
 	home, _ := os.UserHomeDir()
-	return home + string(os.PathSeparator) + ".cherry" + string(os.PathSeparator) + "cache"
+	return home + string(os.PathSeparator) + ".rubik" + string(os.PathSeparator) + "cache"
 }
 
 func getCacheDir() string {

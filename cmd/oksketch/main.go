@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/manifoldco/promptui"
-	"github.com/oksketch/sketch/pkg"
+	"github.com/rubikorg/rubik/pkg"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 		switch mainCmd {
 		case "create":
 			if len(args) == 1 {
-				pkg.ErrorMsg("sketch needs a value for folder name after create command. Example: oksketch create helloworld.")
+				pkg.ErrorMsg("rubik needs a value for folder name after create command. Example: oksketch create helloworld.")
 				return
 			}
 			err := create(args[1])
@@ -29,19 +29,19 @@ func main() {
 			}
 			break
 		case "run":
-			var sketchConfig pkg.Config
+			var rubikConfig pkg.Config
 			pwd, _ := os.Getwd()
-			configPath := pwd + string(os.PathSeparator) + "sketch.toml"
-			_, err := toml.DecodeFile(configPath, &sketchConfig)
+			configPath := pwd + string(os.PathSeparator) + "rubik.toml"
+			_, err := toml.DecodeFile(configPath, &rubikConfig)
 			if err != nil {
 				pkg.ErrorMsg("Bad config. Raw: " + err.Error())
 				return
 			}
 
-			if len(sketchConfig.App) > 1 && len(args) == 1 {
+			if len(rubikConfig.App) > 1 && len(args) == 1 {
 				var appSlice []string
 				var lookup = make(map[string]int)
-				for i, app := range sketchConfig.App {
+				for i, app := range rubikConfig.App {
 					appSlice = append(appSlice, app.Name)
 					lookup[app.Name] = i
 				}

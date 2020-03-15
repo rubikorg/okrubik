@@ -5,12 +5,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/oksketch/sketch"
+	"github.com/rubikorg/rubik"
 
-	"github.com/oksketch/sketch/pkg"
+	"github.com/rubikorg/rubik/pkg"
 )
 
-var chcl = sketch.NewClient(BaseAssetURL, time.Second*30)
+var chcl = rubik.NewClient(BaseAssetURL, time.Second*30)
 
 func create(projectName string) error {
 	path, _ := os.Getwd()
@@ -26,7 +26,7 @@ func create(projectName string) error {
 	// check if getting started zip file is present in cache dir
 	if _, err := os.Stat(gsPath); os.IsNotExist(err) {
 		// if not download it
-		gsFileEn := sketch.DownloadRequestEntity{
+		gsFileEn := rubik.DownloadRequestEntity{
 			TargetFilePath: gsPath,
 		}.Route(GSFile)
 
@@ -40,7 +40,7 @@ func create(projectName string) error {
 	// unzip base template to project path
 	unzipFileFromCache(GSFile, projPath)
 
-	pkg.SketchMsg("Created cherry project " + projectName + ". Happy picking!")
+	pkg.RubikMsg("Created rubik project " + projectName + ". Happy solving your cube!")
 
 	return nil
 }

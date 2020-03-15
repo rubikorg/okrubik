@@ -1,20 +1,20 @@
 package main
 
 import (
-	cfg "github.com/oksketch/oksketch/cmd/server/config"
-	"github.com/oksketch/oksketch/cmd/server/routers"
-	"github.com/oksketch/sketch"
+	cfg "github.com/rubikorg/okrubik/cmd/server/config"
+	"github.com/rubikorg/okrubik/cmd/server/routers"
+	"github.com/rubikorg/rubik"
 )
 
 func main() {
 	var config cfg.ProjectConfig
-	err := sketch.Load(&config)
+	err := rubik.Load(&config)
 
 	if err != nil {
 		panic(err)
 	}
 
 	routers.Import()
-	panic(sketch.Run())
+	panic(rubik.Run())
 
 }

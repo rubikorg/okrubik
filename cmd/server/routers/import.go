@@ -1,12 +1,12 @@
 package routers
 
 import (
-	"github.com/oksketch/oksketch/cmd/server/routers/index"
-	"github.com/oksketch/sketch"
+	"github.com/rubikorg/okrubik/cmd/server/routers/index"
+	"github.com/rubikorg/rubik"
 )
 
 func Import() {
 	// index
-	sketch.Use(index.Router)
+	rubik.Use(index.Router)
 
 }
