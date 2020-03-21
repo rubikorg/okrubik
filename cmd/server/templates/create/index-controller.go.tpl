@@ -5,5 +5,5 @@ import (
 )
 
 func indexCtl(en interface{}) (interface{}, error) {
-	return rubik.Render("index.html", nil, rubik.Type.HTML)
+	return "Hello, World!", nil
 }

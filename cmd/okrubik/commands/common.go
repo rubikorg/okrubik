@@ -1,8 +1,12 @@
-package main
+package commands
 
 import (
 	"archive/zip"
 	"io"
+	"time"
+
+	"github.com/rubikorg/rubik"
+
 	//"net/http"
 	"os"
 	"path/filepath"
@@ -10,8 +14,10 @@ import (
 	"github.com/rubikorg/rubik/pkg"
 )
 
+var rubcl = rubik.NewClient(BaseAssetURL, time.Second*30)
+
 const (
-	// BaseAssetURL is the base url for getting files neede for oksketch
+	// BaseAssetURL is the base url for getting files neede for okrubik
 	BaseAssetURL = "http://localhost:7000"
 	// GSFile is the getting started file path
 	GSFile = "/gs.zip"

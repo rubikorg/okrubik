@@ -1,7 +1,6 @@
 package config
 
+// ProjectConfig defines your server related configuration
 type ProjectConfig struct {
-	Host  string `toml:"asset_host"`
 	Port  string `toml:"port"`
-	Bench string `toml:"bench"`
 }
