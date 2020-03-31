@@ -2,11 +2,11 @@ package commands
 
 import (
 	"fmt"
+
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik/pkg"
-	//"errors"
 
-	"time"
+	//"errors"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/caarlos0/spin"
@@ -17,65 +17,62 @@ import (
 	// "time"
 )
 
+var createQuestions = []*survey.Question{
+	{
+		Name:     "name",
+		Prompt:   &survey.Input{Message: "Project Name?"},
+		Validate: survey.Required,
+	},
+	{
+		Name: "modulePath",
+		Prompt: &survey.Input{
+			Message: "Init go.mod with path?",
+			Help: "Keeping this blank will use the go.mod module " +
+				"directive same as project name",
+		},
+		Validate: survey.Required,
+	},
+	// {
+	// 	Name: "type",
+	// 	Prompt: &survey.Select{
+	// 		Message: "Project Type?",
+	// 		Options: []string{"server"},
+	// 	},
+	// },
+	{
+		Name: "port",
+		Prompt: &survey.Input{
+			Message: "Default server port?",
+			Default: "7000",
+		},
+	},
+	{
+		Name: "done",
+		Prompt: &survey.Confirm{
+			Default: true,
+			Message: "Confirm?",
+			Help:    "Start with rubik's development by confirming",
+		},
+	},
+}
+
 func prompts() error {
-	var qs = []*survey.Question{
-		{
-			Name:     "name",
-			Prompt:   &survey.Input{Message: "Project Name?"},
-			Validate: survey.Required,
-		},
-		{
-			Name: "modulePath",
-			Prompt: &survey.Input{
-				Message: "Init go.mod with path?",
-				Help:    "Keeping this blank will use the go.mod module directive same as project name",
-			},
-		},
-		// {
-		// 	Name: "type",
-		// 	Prompt: &survey.Select{
-		// 		Message: "Project Type?",
-		// 		Options: []string{"server"},
-		// 	},
-		// },
-		{
-			Name: "port",
-			Prompt: &survey.Input{
-				Message: "Default server port?",
-				Default: ":7000",
-			},
-		},
-		{
-			Name: "done",
-			Prompt: &survey.Confirm{
-				Default: true,
-				Message: "Confirm?",
-				Help:    "Start with rubik's development by confirming",
-			},
-		},
-	}
 	var cbe entity.CreateBoilerplateEntity
-	err := survey.Ask(qs, &cbe)
+	survey.Ask(createQuestions, &cbe)
 
 	s := spin.New("%s Requesting template")
 	s.Set(spin.Spin3)
 	s.Start()
-
-	resp, err := rubcl.Get(cbe.Route("/boilerplate/create"))
-	fmt.Println(resp.Body)
 	defer s.Stop()
 
+	cbe.PointTo = "/boilerplate/create"
+	resp, err := rubcl.Get(cbe)
 	if err != nil {
 		pkg.ErrorMsg("Error while requesting boilerplate for rubik")
 		return err
 	}
 
-	defer s.Stop()
-	time.Sleep(2 * time.Second)
-
-	if err != nil {
-		panic(err)
-	}
+	fmt.Println(resp.ParsedBody)
 
 	return nil
 }
@@ -83,7 +80,10 @@ func prompts() error {
 // Create command main method of the okrubik cli
 func Create() error {
 	// ask necessary questions
-	prompts()
+	err := prompts()
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	//path, _ := os.Getwd()
 	//projPath := path + string(os.PathSeparator) + projectName
