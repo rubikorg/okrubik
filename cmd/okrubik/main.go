@@ -4,8 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 
-	"github.com/BurntSushi/toml"
+	"github.com/rubikorg/rubik/replc"
+
 	"github.com/rubikorg/okrubik/cmd/okrubik/commands"
 
 	"github.com/rubikorg/rubik/pkg"
@@ -27,43 +30,35 @@ func main() {
 			}
 			break
 		case "run":
-			var rubikConfig pkg.Config
-			pwd, _ := os.Getwd()
-			configPath := pwd + string(os.PathSeparator) + "rubik.toml"
-			_, err := toml.DecodeFile(configPath, &rubikConfig)
+			err := commands.Run()
 			if err != nil {
-				pkg.ErrorMsg("Bad config. Raw: " + err.Error())
-				return
+				pkg.ErrorMsg(err.Error())
 			}
-
-			fmt.Print("hey")
-
-			//if len(rubikConfig.App) > 1 && len(args) == 1 {
-			//	var appSlice []string
-			//	var lookup = make(map[string]int)
-			//	for i, app := range rubikConfig.App {
-			//		appSlice = append(appSlice, app.Name)
-			//		lookup[app.Name] = i
-			//	}
-			//	prompt := promptui.Select{
-			//		Label: "Run app:",
-			//		Items: appSlice,
-			//	}
-			//
-			//	_, _, _ = prompt.Run()
-			//	//in := lookup[result]
-			//	//cmd += sketchConfig.App[in].Path
-			//	return
-			//} else {
-			//
-			//}
-
 			break
+		case "help":
+			fmt.Println(replc.HelpCommand([]string{}))
 		default:
 			pkg.ErrorMsg("No such command")
 		}
 
 	} else {
-		pkg.ErrorMsg("Nothing to do")
+		pwd, _ := os.Getwd()
+		cfg := pkg.GetRubikConfig()
+		if cfg.ProjectName == "" {
+			pkg.ErrorMsg("Not a rubik project! Are you on the root of your project?")
+			return
+		}
+
+		// DANGER: this is using hardcoded App[1]
+		basePath := strings.Replace(cfg.App[1].Path, "./",
+			pwd+"/", 1)
+		path := basePath + "/main.go"
+		os.Setenv("RUBIK_MODE", "repl")
+		os.Chdir(basePath)
+		cmd := exec.Command("go", "run", path)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+		os.Unsetenv("RUBIK_MODE")
 	}
 }
