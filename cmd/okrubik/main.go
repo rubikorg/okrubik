@@ -3,9 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/rubikorg/rubik/replc"
 
@@ -41,24 +38,25 @@ func main() {
 			pkg.ErrorMsg("No such command")
 		}
 
-	} else {
-		pwd, _ := os.Getwd()
-		cfg := pkg.GetRubikConfig()
-		if cfg.ProjectName == "" {
-			pkg.ErrorMsg("Not a rubik project! Are you on the root of your project?")
-			return
-		}
-
-		// DANGER: this is using hardcoded App[1]
-		basePath := strings.Replace(cfg.App[1].Path, "./",
-			pwd+"/", 1)
-		path := basePath + "/main.go"
-		os.Setenv("RUBIK_MODE", "repl")
-		os.Chdir(basePath)
-		cmd := exec.Command("go", "run", path)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-		os.Unsetenv("RUBIK_MODE")
 	}
+	// else {
+	// 	pwd, _ := os.Getwd()
+	// 	cfg := pkg.GetRubikConfig()
+	// 	if cfg.ProjectName == "" {
+	// 		pkg.ErrorMsg("Not a rubik project! Are you on the root of your project?")
+	// 		return
+	// 	}
+
+	// 	// DANGER: this is using hardcoded App[1]
+	// 	basePath := strings.Replace(cfg.App[1].Path, "./",
+	// 		pwd+"/", 1)
+	// 	path := basePath + "/main.go"
+	// 	os.Setenv("RUBIK_MODE", "repl")
+	// 	os.Chdir(basePath)
+	// 	cmd := exec.Command("go", "run", path)
+	// 	cmd.Stdin = os.Stdin
+	// 	cmd.Stdout = os.Stdout
+	// 	cmd.Run()
+	// 	os.Unsetenv("RUBIK_MODE")
+	// }
 }
