@@ -32,6 +32,12 @@ func main() {
 				pkg.ErrorMsg(err.Error())
 			}
 			break
+		case "gen":
+			err := commands.Gen(args[1:])
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+			break
 		case "help":
 			fmt.Println(replc.HelpCommand([]string{}))
 		default:
