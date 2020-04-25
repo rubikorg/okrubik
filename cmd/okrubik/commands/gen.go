@@ -1,7 +1,9 @@
 package commands
 
 import (
+	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -9,6 +11,8 @@ import (
 	"github.com/rubikorg/okrubik/cmd/okrubik/choose"
 	r "github.com/rubikorg/rubik"
 	"github.com/rubikorg/rubik/pkg"
+
+	"text/template"
 )
 
 type RouterTemplate struct {
@@ -39,22 +43,30 @@ func Gen(args []string) error {
 			return errors.New("router with name `" + args[1] + "` already exists")
 		}
 		// create new folder inside routers
-		os.MkdirAll(routerPath, 0655)
+		os.MkdirAll(routerPath, 0755)
 		// create route file from template
-		// TODO: check and download this template if not there
-		routeTplPath := filepath.Join(pkg.MakeAndGetCacheDirPath(), "templates", "route.tpl")
-		routeByte := r.Render(r.Type.Text, RouterTemplate{args[1]}, routeTplPath)
-		if routeByte.Error != nil {
-			return routeByte.Error
-		}
-
-		fileContent := routeByte.Data.([]byte)
-		routePath := filepath.Join(routerPath, "route.go")
-		err := ioutil.WriteFile(routePath, fileContent, 0644)
+		tplData, err := getOrDownloadTemplateData("route.tpl")
+		ctlTplData, err := getOrDownloadTemplateData("controller.tpl")
 		if err != nil {
 			return err
 		}
+		var buf bytes.Buffer
+		var ctlBuf bytes.Buffer
+		t, err := template.New("route").Parse(tplData)
+		ctlT, err := template.New("controller").Parse(ctlTplData)
+		err = t.Execute(&buf, RouterTemplate{args[1]})
+		err = ctlT.Execute(&ctlBuf, RouterTemplate{args[1]})
+		if err != nil {
+			return err
+		}
+
+		err = ioutil.WriteFile(filepath.Join(routerPath, "route.go"), buf.Bytes(), 0655)
 		// create controller file from template
+		err = ioutil.WriteFile(filepath.Join(routerPath, "controller.go"), ctlBuf.Bytes(), 0655)
+		if err != nil {
+			return err
+		}
+
 		// use ast to write new router to import.go
 		break
 	case "route":
@@ -69,4 +81,33 @@ func Gen(args []string) error {
 		break
 	}
 	return nil
+}
+
+func getOrDownloadTemplateData(templateName string) (string, error) {
+	routeTplPath := filepath.Join(pkg.MakeAndGetCacheDirPath(), "templates")
+	os.MkdirAll(routeTplPath, 0755)
+	routeTplPath = filepath.Join(routeTplPath, templateName)
+
+	var templateStr string
+	if f, _ := os.Stat(routeTplPath); f == nil {
+		// dowblaod the file
+		routeTpleDownload := r.DownloadRequestEntity{
+			TargetFilePath: routeTplPath,
+		}
+		routeTpleDownload.PointTo = "/boilerplate/" + templateName
+		raw, err := rubcl.Download(routeTpleDownload)
+		if err != nil {
+			return "", err
+		}
+		templateStr = string(raw)
+		fmt.Println("rawstring", templateStr)
+	} else {
+		b, err := ioutil.ReadFile(routeTplPath)
+		if err != nil {
+			return "", err
+		}
+
+		templateStr = string(b)
+	}
+	return templateStr, nil
 }

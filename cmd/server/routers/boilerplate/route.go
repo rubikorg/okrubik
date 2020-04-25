@@ -1,7 +1,6 @@
 package boilerplate
 
 import (
-	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik"
 )
 
@@ -10,10 +9,10 @@ var Router = rubik.Create("/boilerplate")
 
 var createRoute = rubik.Route{
 	Path:       "/create",
-	Entity:     entity.CreateBoilerplateEntity{},
 	Controller: createCtl,
 }
 
 func init() {
 	Router.Add(createRoute)
+	Router.StorageRoutes("route.tpl", "controller.tpl")
 }
