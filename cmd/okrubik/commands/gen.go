@@ -1,23 +1,15 @@
 package commands
 
 import (
-	"bytes"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/rubikorg/okrubik/cmd/okrubik/choose"
-	r "github.com/rubikorg/rubik"
-	"github.com/rubikorg/rubik/pkg"
-
-	"text/template"
+	"github.com/rubikorg/okrubik/pkg/entity"
 )
-
-type RouterTemplate struct {
-	RouterName string
-}
 
 // Gen is code generation method for rubik
 // it can generate routers and routes
@@ -38,37 +30,9 @@ func Gen(args []string) error {
 			return errors.New("router requires a name to initialize")
 		}
 
-		routerPath := filepath.Join(path, "routers", args[1])
-		if f, _ := os.Stat(routerPath); f != nil {
-			return errors.New("router with name `" + args[1] + "` already exists")
-		}
-		// create new folder inside routers
-		os.MkdirAll(routerPath, 0755)
-		// create route file from template
-		tplData, err := getOrDownloadTemplateData("route.tpl")
-		ctlTplData, err := getOrDownloadTemplateData("controller.tpl")
-		if err != nil {
-			return err
-		}
-		var buf bytes.Buffer
-		var ctlBuf bytes.Buffer
-		t, err := template.New("route").Parse(tplData)
-		ctlT, err := template.New("controller").Parse(ctlTplData)
-		err = t.Execute(&buf, RouterTemplate{args[1]})
-		err = ctlT.Execute(&ctlBuf, RouterTemplate{args[1]})
-		if err != nil {
-			return err
-		}
-
-		err = ioutil.WriteFile(filepath.Join(routerPath, "route.go"), buf.Bytes(), 0655)
-		// create controller file from template
-		err = ioutil.WriteFile(filepath.Join(routerPath, "controller.go"), ctlBuf.Bytes(), 0655)
-		if err != nil {
-			return err
-		}
-
+		return genRouter(path, args[1])
 		// use ast to write new router to import.go
-		break
+
 	case "route":
 		// check if router name is given as argument
 		// use ast to write a new route
@@ -83,31 +47,34 @@ func Gen(args []string) error {
 	return nil
 }
 
-func getOrDownloadTemplateData(templateName string) (string, error) {
-	routeTplPath := filepath.Join(pkg.MakeAndGetCacheDirPath(), "templates")
-	os.MkdirAll(routeTplPath, 0755)
-	routeTplPath = filepath.Join(routeTplPath, templateName)
-
-	var templateStr string
-	if f, _ := os.Stat(routeTplPath); f == nil {
-		// dowblaod the file
-		routeTpleDownload := r.DownloadRequestEntity{
-			TargetFilePath: routeTplPath,
-		}
-		routeTpleDownload.PointTo = "/boilerplate/" + templateName
-		raw, err := rubcl.Download(routeTpleDownload)
-		if err != nil {
-			return "", err
-		}
-		templateStr = string(raw)
-		fmt.Println("rawstring", templateStr)
-	} else {
-		b, err := ioutil.ReadFile(routeTplPath)
-		if err != nil {
-			return "", err
-		}
-
-		templateStr = string(b)
+func genRouter(path, name string) error {
+	routerPath := filepath.Join(path, "routers", name)
+	if f, _ := os.Stat(routerPath); f != nil {
+		return errors.New("router with name `" + name + "` already exists")
 	}
-	return templateStr, nil
+	// create new folder inside routers
+	os.MkdirAll(routerPath, 0755)
+	// fetch route and controller
+	var files map[string]string
+	en := entity.GenRouterEntity{
+		RouterName: name,
+	}
+	en.PointTo = "/boilerplate/gen.router"
+	en.Infer = &files
+	_, err := rubcl.Get(en)
+
+	if err != nil {
+		return err
+	}
+
+	// create route and controller file from template
+	for k, v := range files {
+		fileName := strings.ReplaceAll(k, "tpl", "go")
+		err = ioutil.WriteFile(filepath.Join(routerPath, fileName), []byte(v), 0655)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

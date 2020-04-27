@@ -1,6 +1,7 @@
 package boilerplate
 
 import (
+	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik"
 )
 
@@ -12,7 +13,12 @@ var createRoute = rubik.Route{
 	Controller: createCtl,
 }
 
+var genRouterRoute = rubik.Route{
+	Path:       "/gen.router",
+	Entity:     &entity.GenRouterEntity{},
+	Controller: genRouterCtl,
+}
 func init() {
 	Router.Add(createRoute)
-	Router.StorageRoutes("route.tpl", "controller.tpl")
+	Router.Add(genRouterRoute)
 }

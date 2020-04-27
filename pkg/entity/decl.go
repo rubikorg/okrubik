@@ -11,4 +11,9 @@ type CreateBoilerplateEntity struct {
 	ModulePath string `rubik:"modulePath|query"`
 	Port       int    `rubik:"port|query"`
 	Name       string `rubik:"name|query"`
+
+// GenRouterEntity is used when user executes `okrubik gen router [name]`
+type GenRouterEntity struct {
+	rubik.Entity
+	RouterName string
 }
