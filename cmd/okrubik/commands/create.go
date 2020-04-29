@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -86,7 +87,7 @@ func Create() error {
 	}
 
 	// check if project dir exists
-	basePath := filepath.Join(".", cbe.Name)
+	basePath := filepath.Join(".", cbe.Name, "cmd", "server")
 	if f, _ := os.Stat(basePath); f != nil {
 		return errors.New("Folder with same project name exists")
 	}
@@ -94,8 +95,14 @@ func Create() error {
 	os.MkdirAll(basePath, 0755)
 
 	for name, content := range files {
+		var truePath string
 		namePath := strings.Split(name, "-")
-		truePath := basePath
+		if strings.Contains(name, "rubik.toml") {
+			truePath = filepath.Join(".", cbe.Name)
+		} else {
+			truePath = basePath
+		}
+
 		for _, p := range namePath {
 			// ignore file name
 			if !strings.Contains(p, ".tpl") {
@@ -116,6 +123,21 @@ func Create() error {
 			return err
 		}
 	}
+
+	// init go.mod file
+	os.Chdir(filepath.Join(".", cbe.Name))
+	cmd := exec.Command("go", "mod", "init", cbe.ModulePath)
+	tidyCmd := exec.Command("go", "mod", "tidy")
+	cmd.Stdout = os.Stdout
+	tidyCmd.Stdout = os.Stdout
+
+	cmd.Run()
+	creationOutput("create", "go.mod")
+
+	tidyCmd.Run()
+	creationOutput("tidy", cbe.Name)
+
+	fmt.Println("Done! Run command: okrubik run")
 
 	return nil
 }

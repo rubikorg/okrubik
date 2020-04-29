@@ -1,7 +1,6 @@
 package routers
 
 import (
-	"{{ .ModulePath }}/cmd/server/routers/boilerplate"
 	"{{ .ModulePath }}/cmd/server/routers/index"
 	"github.com/rubikorg/rubik"
 )

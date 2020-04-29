@@ -5,5 +5,5 @@ import (
 )
 
 func indexCtl(en interface{}) r.ByteResponse {
-	return r.Success("Hello, world")
+	return r.Render(r.Type.HTML, nil, "index.html")
 }
