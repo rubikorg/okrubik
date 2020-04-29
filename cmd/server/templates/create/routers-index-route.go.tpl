@@ -1,13 +1,13 @@
 package index
 
 import (
-	"github.com/rubikorg/rubik"
+	r "github.com/rubikorg/rubik"
 )
 
 // Router is index's router
-var Router = rubik.Create("/")
+var Router = r.Create("/")
 
-var indexRoute = rubik.Route{
+var indexRoute = r.Route{
 	Path:       "/",
 	Controller: indexCtl,
 }
