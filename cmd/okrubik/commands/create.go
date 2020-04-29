@@ -1,21 +1,21 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 
+	"github.com/printzero/tint"
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik/pkg"
 
-	//"errors"
-
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/caarlos0/spin"
-	//"os"
-	//"github.com/rubikorg/rubik"
-	//"github.com/rubikorg/rubik/pkg"
-	//"os"
-	// "time"
 )
+
+var t = tint.Init()
 
 var createQuestions = []*survey.Question{
 	{
@@ -56,63 +56,72 @@ var createQuestions = []*survey.Question{
 	},
 }
 
-func prompts() error {
+func prompts() (entity.CreateBoilerplateEntity, error) {
 	var cbe entity.CreateBoilerplateEntity
-	survey.Ask(createQuestions, &cbe)
+	err := survey.Ask(createQuestions, &cbe)
 
-	s := spin.New("%s Requesting template")
-	s.Set(spin.Spin3)
-	s.Start()
-	defer s.Stop()
-
-	cbe.PointTo = "/boilerplate/create"
-	resp, err := rubcl.Get(cbe)
 	if err != nil {
-		pkg.ErrorMsg("Error while requesting boilerplate for rubik")
-		return err
+		return entity.CreateBoilerplateEntity{}, err
 	}
 
-	fmt.Println(resp.ParsedBody)
-
-	return nil
+	return cbe, nil
 }
 
 // Create command main method of the okrubik cli
 func Create() error {
 	// ask necessary questions
-	err := prompts()
+	cbe, err := prompts()
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
-	//path, _ := os.Getwd()
-	//projPath := path + string(os.PathSeparator) + projectName
-	//
-	//if f, _ := os.Stat(projPath); f != nil {
-	//	return errors.New("Folder with name " + projectName + " already exists.")
-	//}
-	//
-	//// create cache dir if not exists
-	//cachePath := getCacheDir()
-	//gsPath := cachePath + string(os.PathSeparator) + "gs.zip"
-	//// check if getting started zip file is present in cache dir
-	//if _, err := os.Stat(gsPath); os.IsNotExist(err) {
-	//	// if not download it
-	//	gsFileEn := rubik.DownloadRequestEntity{
-	//		TargetFilePath: gsPath,
-	//	}.Route(GSFile)
-	//
-	//	err := chcl.Download(gsFileEn)
-	//
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
+	var files map[string]string
+	cbe.PointTo = "/boilerplate/create"
+	cbe.Infer = &files
 
-	// unzip base template to project path
-	//unzipFileFromCache(GSFile, projPath)
-	//
-	//pkg.RubikMsg("Created rubik project " + projectName + ". Happy solving your cube!")
+	_, err = rubcl.Get(cbe)
+	if err != nil {
+		pkg.ErrorMsg("Error while requesting boilerplate for rubik")
+		return err
+	}
+
+	// check if project dir exists
+	basePath := filepath.Join(".", cbe.Name)
+	if f, _ := os.Stat(basePath); f != nil {
+		return errors.New("Folder with same project name exists")
+	}
+
+	os.MkdirAll(basePath, 0755)
+
+	for name, content := range files {
+		namePath := strings.Split(name, "-")
+		truePath := basePath
+		for _, p := range namePath {
+			// ignore file name
+			if !strings.Contains(p, ".tpl") {
+				truePath = filepath.Join(truePath, p)
+			}
+		}
+
+		os.MkdirAll(truePath, 0755)
+
+		file := namePath[len(namePath)-1]
+		// remove .tpl suffix
+		file = strings.ReplaceAll(file, ".tpl", "")
+		filePath := filepath.Join(truePath, file)
+
+		creationOutput("create", filePath)
+		err := ioutil.WriteFile(filePath, []byte(content), 0755)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
+}
+
+func creationOutput(typ, path string) {
+	msg := fmt.Sprintf("@(%s) %s", typ, path)
+	op := t.Exp(msg, tint.Green)
+	fmt.Println(op)
 }
