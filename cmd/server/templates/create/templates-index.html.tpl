@@ -49,6 +49,7 @@
         <p>Star on</p>
         <a href="https://github.com/rubikorg/rubik"><span>Github</span></a>
         <br />
+        <br />
         <b>Community:</b>
         <p>Ask Questions and Support on</p>
         <a href="https://discord.gg/uby24rH"><span>Discord</span></a>
