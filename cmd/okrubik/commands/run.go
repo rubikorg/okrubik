@@ -85,7 +85,6 @@ func Run() error {
 
 	if lookup[answer].Watchable {
 		go runServer(basePath)
-		fmt.Println("Watching !!")
 		err := w.AddRecursive(basePath)
 		if err != nil {
 			panic(err)
