@@ -83,15 +83,19 @@ func Run() error {
 
 	basePath = strings.Replace(lookup[answer].Path, "./", pwd+sep, 1)
 
-	go runServer(basePath)
+	if lookup[answer].Watchable {
+		go runServer(basePath)
+		fmt.Println("Watching !!")
+		err := w.AddRecursive(basePath)
+		if err != nil {
+			panic(err)
+		}
 
-	err := w.AddRecursive(basePath)
-	if err != nil {
-		panic(err)
-	}
-
-	if err := w.Start(time.Millisecond * 100); err != nil {
-		log.Fatalln(err)
+		if err := w.Start(time.Millisecond * 100); err != nil {
+			log.Fatalln(err)
+		}
+	} else {
+		runServer(basePath)
 	}
 	return nil
 }
