@@ -127,19 +127,24 @@ func Create() error {
 	// init go.mod file
 	os.Chdir(filepath.Join(".", cbe.Name))
 	cmd := exec.Command("go", "mod", "init", cbe.ModulePath)
-	tidyCmd := exec.Command("go", "mod", "tidy")
 	cmd.Stdout = os.Stdout
-	tidyCmd.Stdout = os.Stdout
 
 	cmd.Run()
 	creationOutput("create", "go.mod")
 
-	tidyCmd.Run()
-	creationOutput("tidy", cbe.Name)
+	runTidyCommand(cbe.Name)
 
 	fmt.Println("Done! Run command: okrubik run")
 
 	return nil
+}
+
+func runTidyCommand(name string) {
+	tidyCmd := exec.Command("go", "mod", "tidy")
+	tidyCmd.Stdout = os.Stdout
+
+	tidyCmd.Run()
+	creationOutput("tidy", name)
 }
 
 func creationOutput(typ, path string) {

@@ -11,6 +11,7 @@ type CreateBoilerplateEntity struct {
 	ModulePath string
 	Port       string
 	Name       string
+	Bin        string
 	Done       bool
 }
 

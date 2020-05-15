@@ -1,8 +1,8 @@
 package main
 
 import (
-	cfg "{{ .ModulePath }}/cmd/server/config"
-	"{{ .ModulePath }}/cmd/server/routers"
+	cfg "{{ .ModulePath }}/cmd/{{ .Bin }}/config"
+	"{{ .ModulePath }}/cmd/{{ .Bin }}/routers"
 	r "github.com/rubikorg/rubik"
 )
 

@@ -1,4 +1,5 @@
 name = "{{ .Name }}"
+module = "{{ .ModulePath }}"
 
 [[app]]
 name = "server"
