@@ -40,8 +40,8 @@ github.com/radovskyb/watcher v1.0.7/go.mod h1:78okwvY5wPdzcb1UYnip1pvrZNIVEIh/Cm
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rubikorg/blocks v0.0.0-20200320142242-f0eb666c9c44 h1:cb6sLEWEHVspnAP1mbMfLc0eqwNhiRB2iyxw8TLmJI4=
 github.com/rubikorg/blocks v0.0.0-20200320142242-f0eb666c9c44/go.mod h1:69qJ18WGHys0jL96nZjLiL3vLWq9e7tzuGAVQzCjQQQ=
-github.com/rubikorg/blocks v0.0.0-20200519185721-7030d48cd602 h1:x6eUSZoEDMWubNWPRgLHzmzTo8UKmeS9goOwZXX6YnQ=
-github.com/rubikorg/blocks v0.0.0-20200519185721-7030d48cd602/go.mod h1:JDn5b6JZXt/9gv7e5m1S2/dGaqCBxNJa0furqt4OOEY=
+github.com/rubikorg/blocks v0.0.0-20200522155009-a53511d56543 h1:TS17tsQGfhUbHeweWhE29Zw1SyXzotkXvbQBvBOw3HM=
+github.com/rubikorg/blocks v0.0.0-20200522155009-a53511d56543/go.mod h1:JDn5b6JZXt/9gv7e5m1S2/dGaqCBxNJa0furqt4OOEY=
 github.com/rubikorg/rubik v0.0.0-20200320142558-622c411be4d2 h1:LBJA3HsFmTTKBzUXFQdaU0kRgRe0ZV4uEIa7PODHZTg=
 github.com/rubikorg/rubik v0.0.0-20200320142558-622c411be4d2/go.mod h1:C6FosWVP314zYfxUJyqXv/9S6eHGwua2pPHOhLIc9UI=
 github.com/rubikorg/rubik v0.0.0-20200522130104-26ab20de38cc h1:ficbllswG30Rt5s8IOEToziphLbnrNOMzqioWkCsl8E=
