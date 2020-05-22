@@ -11,20 +11,20 @@ mkdir -p "$release_folder/darwin"
 mkdir -p "$release_folder/linux"
 echo "Creating target ..."
 mkdir -p $target_folder
-rm $(find $target_folder -name "*-$current_version.zip")
+rm $(find $target_folder -name "*-amd64.zip")
 
 echo "Building for OSX ..."
-env GOOS=darwin GOARCH=amd64 go build -o "$release_folder/darwin/Darwin-amd64" cmd/okrubik/main.go
+env GOOS=darwin GOARCH=amd64 go build -o "$release_folder/darwin/okrubik" cmd/okrubik/main.go
 echo "Building for Linux ..."
-env GOOS=linux GOARCH=amd64 go build -o "$release_folder/linux/Linux-amd64" cmd/okrubik/main.go
+env GOOS=linux GOARCH=amd64 go build -o "$release_folder/linux/okrubik" cmd/okrubik/main.go
 
 echo "Archiving OSX ..."
 cd "$release_folder/darwin"
-zip -r "$target_folder/darwin-amd64-$current_version.zip" .
+zip -r "$target_folder/okrubik-darwin-amd64.zip" .
 
 echo "Archiving Linux ..."
 cd "$release_folder/linux"
-zip -r "$target_folder/linux-amd64-$current_version.zip" .
+zip -r "$target_folder/okrubik-linux-amd64.zip" .
 
 echo "Final cleanup ..."
 rm -rf "$base/releases/"
