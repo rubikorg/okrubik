@@ -172,7 +172,7 @@ func genBin(name, port string) error {
 			os.MkdirAll(truePath, 0755)
 			fileName := strings.ReplaceAll(namePath[len(namePath)-1], ".tpl", "")
 			filePath := filepath.Join(truePath, fileName)
-			creationOutput("create", filePath)
+			creationOutput("creating", filePath)
 			err := ioutil.WriteFile(filePath, []byte(content), 0755)
 			if err != nil {
 				return err
@@ -182,7 +182,7 @@ func genBin(name, port string) error {
 
 	runTidyCommand(name)
 
-	creationOutput("configure", rubikToml)
+	creationOutput("configuring", rubikToml)
 
 	var buf bytes.Buffer
 	enc := toml.NewEncoder(&buf)
