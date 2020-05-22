@@ -72,6 +72,7 @@ func prompts() (entity.CreateBoilerplateEntity, error) {
 func Create() error {
 	// ask necessary questions
 	cbe, err := prompts()
+	cbe.Bin = "server"
 	if err != nil {
 		return err
 	}
@@ -93,11 +94,11 @@ func Create() error {
 	}
 
 	os.MkdirAll(basePath, 0755)
-
+	rootFiles := []string{"rubik.toml", "README.md"}
 	for name, content := range files {
 		var truePath string
 		namePath := strings.Split(name, "-")
-		if strings.Contains(name, "rubik.toml") {
+		if in(name, rootFiles) {
 			truePath = filepath.Join(".", cbe.Name)
 		} else {
 			truePath = basePath
@@ -117,7 +118,7 @@ func Create() error {
 		file = strings.ReplaceAll(file, ".tpl", "")
 		filePath := filepath.Join(truePath, file)
 
-		creationOutput("create", filePath)
+		creationOutput("creating", filePath)
 		err := ioutil.WriteFile(filePath, []byte(content), 0755)
 		if err != nil {
 			return err
@@ -130,7 +131,7 @@ func Create() error {
 	cmd.Stdout = os.Stdout
 
 	cmd.Run()
-	creationOutput("create", "go.mod")
+	creationOutput("creating", "go.mod")
 
 	runTidyCommand(cbe.Name)
 
@@ -144,11 +145,20 @@ func runTidyCommand(name string) {
 	tidyCmd.Stdout = os.Stdout
 
 	tidyCmd.Run()
-	creationOutput("tidy", name)
+	creationOutput("tidying up |> ", name)
 }
 
 func creationOutput(typ, path string) {
 	msg := fmt.Sprintf("@(%s) %s", typ, path)
 	op := t.Exp(msg, tint.Green)
 	fmt.Println(op)
+}
+
+func in(name string, collection []string) bool {
+	for _, n := range collection {
+		if n == name || strings.Contains(name, n) {
+			return true
+		}
+	}
+	return false
 }
