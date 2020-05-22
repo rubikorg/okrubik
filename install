@@ -1,0 +1,52 @@
+#!/bin/sh
+# Copyright 2020 the Rubik authors. All rights reserved. Apache 2.0 license.
+# @contributors: This script must be easy to maintain and must have a single purpose.
+
+set -e
+
+case $(uname -s) in
+	Darwin) target="darwin-amd64" ;;
+	*) target="linux-amd64" ;;
+esac
+
+if [ $(uname -m) != "x86_64" ]; then
+	echo "Unsupported architecture $(uname -m). Only x64 binaries are available."
+	exit
+fi
+
+if [ $# -eq 0 ]; then
+	asset_url=$(
+		command curl -sSf https://github.com/rubikorg/okrubik/releases |
+		command grep -o "/rubikorg/okrubik/releases/download/.*/okrubik-${target}\\.zip" |
+		command head -n 1
+	)
+	if [ ! "$asset_url" ]; then exit 1; fi
+	okrubik_url="https://github.com${asset_url}"
+else
+	okrubik_url="https://github.com/rubikorg/okrubik/releases/download/${1}/okrubik-${target}.zip"
+fi
+
+okrubik_dir="${RUBIK_INSTALL:-$HOME/.rubik}"
+bin_dir="$okrubik_dir/bin"
+exe="$bin_dir/okrubik"
+
+if [ ! -d "$bin_dir" ]; then
+	mkdir -p "$bin_dir"
+fi
+
+echo "Downloading binary ..."
+curl --fail --location --progress-bar --output "$exe.zip" "$okrubik_url"
+cd "$bin_dir"
+unzip -o "$exe.zip"
+chmod +x "$exe"
+rm "$exe.zip"
+
+echo "okrubik was installed successfully to $exe"
+if [ -x "$(command -v okrubik)" ]; then
+	echo "Run 'okrubik help' to get started"
+else
+	echo "Manually add the directory to your \$HOME/.bash_profile (or similar)"
+	echo "  export RUBIK_INSTALL=\"$okrubik_dir\""
+	echo "  export PATH=\"\$RUBIK_INSTALL/bin:\$PATH\""
+	echo "Run '$exe --help' to get started"
+fi
