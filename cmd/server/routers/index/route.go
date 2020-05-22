@@ -1,28 +1,26 @@
 package index
 
 import (
-	"github.com/rubikorg/rubik"
+	"github.com/rubikorg/blocks/cors"
+	"github.com/rubikorg/blocks/guard"
+	r "github.com/rubikorg/rubik"
 )
 
 // Router is index's router
-var Router = rubik.Create("/")
+var Router = r.Create("/")
+var corsMw = r.GetBlock(cors.BlockName).(cors.BlockCors).MW
 
-var indexRoute = rubik.Route{
-	Path: "/",
-	// Middlewares: []rubik.Middleware{
-	// 	guard.JWT(authenticate),
-	// },
+var indexRoute = r.Route{
+	Guard: guard.BasicGuard{},
+	Path:  "/",
+	Middlewares: []r.Middleware{
+		corsMw(),
+	},
+	// Entity:     &entity.CreateBoilerplateEntity{},
 	Controller: indexCtl,
-}
-
-func authenticate(token string) interface{} {
-	if token == "ashish" {
-		return "success"
-	}
-	return "failed"
 }
 
 func init() {
 	Router.Add(indexRoute)
-	Router.StorageRoutes("gs.zip")
+	// Router.StorageRoutes("gs.zip")
 }

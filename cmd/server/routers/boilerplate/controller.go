@@ -16,6 +16,7 @@ var createFiles = []string{
 	"routers-index-route.go.tpl",
 	"routers-import.go.tpl",
 	"static-main.css.tpl",
+	"README.md.tpl",
 }
 
 var genRouterFiles = []string{
