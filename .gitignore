@@ -1,2 +1,13 @@
 cmd/server/storage/gs
 !gs.zip
+
+# okrubik tools/automation folder
+target/
+
+# ignore homebrew formulae
+Formula.rb
+
+# releases/ folder for generating binary releases
+releases/
+# target/ folder for final zip releases
+target/
