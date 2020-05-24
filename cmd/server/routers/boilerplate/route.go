@@ -1,8 +1,6 @@
 package boilerplate
 
 import (
-	"net/http"
-
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik"
 )
@@ -20,7 +18,6 @@ var createRoute = rubik.Route{
 }
 
 var genRouterRoute = rubik.Route{
-	Method:     http.MethodPut,
 	Path:       "/gen.router",
 	Entity:     &entity.GenRouterEntity{},
 	Controller: genRouterCtl,
