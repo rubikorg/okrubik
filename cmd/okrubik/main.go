@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"strings"
 
 	"github.com/rubikorg/rubik/replc"
 
@@ -18,6 +19,15 @@ func main() {
 
 	if len(args) > 0 {
 		mainCmd := args[0]
+
+		// execute command
+		if strings.Contains(mainCmd, "x:") {
+			err := commands.Exec(mainCmd)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+			return
+		}
 
 		switch mainCmd {
 		case "create":
@@ -40,10 +50,10 @@ func main() {
 			break
 		case "help":
 			fmt.Println(replc.HelpCommand([]string{}))
+			break
 		default:
 			pkg.ErrorMsg("No such command")
 		}
-
 	}
 	// else {
 	// 	pwd, _ := os.Getwd()

@@ -12,9 +12,14 @@ import (
 // Project selection prompt
 func Project() (string, error) {
 	pwd, _ := os.Getwd()
+	proj, _ := RawProject()
+	return strings.Replace(proj.Path, "./", pwd+string(os.PathSeparator), 1), nil
+}
+
+func RawProject() (pkg.Project, error) {
 	cfg := pkg.GetRubikConfig()
 	if cfg.ProjectName == "" {
-		return "", errors.New("not a valid rubik config")
+		return pkg.Project{}, errors.New("not a valid rubik config")
 	}
 
 	var lookup = make(map[string]pkg.Project)
@@ -32,5 +37,5 @@ func Project() (string, error) {
 
 	survey.AskOne(prompt, &answer)
 
-	return strings.Replace(lookup[answer].Path, "./", pwd+string(os.PathSeparator), 1), nil
+	return lookup[answer], nil
 }

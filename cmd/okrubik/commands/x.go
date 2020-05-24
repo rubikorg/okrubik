@@ -12,6 +12,7 @@ import (
 	"github.com/rubikorg/rubik/pkg"
 )
 
+// Exec executes the `okrubik x:test` commands
 func Exec(arg string) error {
 	cmdName := strings.Split(arg, ":")
 	if len(cmdName) < 2 || cmdName[1] == "" {
@@ -21,7 +22,7 @@ func Exec(arg string) error {
 	var rubikConf pkg.Config
 	tomlPath := filepath.Join(".", "rubik.toml")
 	if f, _ := os.Stat(tomlPath); f == nil {
-		return errors.New("not a Rubik workspace.")
+		return errors.New("not a Rubik workspace")
 	}
 
 	_, err := toml.DecodeFile(tomlPath, &rubikConf)
@@ -57,6 +58,7 @@ func Exec(arg string) error {
 		os.Chdir(pwdPath)
 	}
 
+	// TODO: fix multiple command working
 	for _, c := range cmds {
 		fullCmd := strings.Split(strings.Trim(c, ""), " ")
 		fmt.Println(fullCmd[0], fullCmd[1:])
