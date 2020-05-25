@@ -51,7 +51,7 @@ func main() {
 		case "help":
 			fmt.Println(replc.HelpCommand([]string{}))
 			break
-		case "update", "u":
+		case "upgrade", "u":
 			err := commands.Update(args[1:])
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
