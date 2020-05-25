@@ -21,7 +21,7 @@ func main() {
 		mainCmd := args[0]
 
 		// execute command
-		if strings.Contains(mainCmd, "x:") {
+		if strings.Contains(mainCmd, "x:") || strings.Contains("exec:") {
 			err := commands.Exec(mainCmd)
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
@@ -30,19 +30,19 @@ func main() {
 		}
 
 		switch mainCmd {
-		case "create":
+		case "create", "c":
 			err := commands.Create()
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
 			}
 			break
-		case "run":
+		case "run", "r":
 			err := commands.Run()
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
 			}
 			break
-		case "gen":
+		case "gen", "generate":
 			err := commands.Gen(args[1:])
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
@@ -50,6 +50,12 @@ func main() {
 			break
 		case "help":
 			fmt.Println(replc.HelpCommand([]string{}))
+			break
+		case "update", "u":
+			err := commands.Update(args[1:])
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
 			break
 		default:
 			pkg.ErrorMsg("No such command")
