@@ -4,6 +4,13 @@
 
 set -e
 
+if [ -x "$(go help)" ]; then
+	echo "Go not installed"
+	exit 1
+else
+	echo "Go installed, analyzing target system"
+fi
+
 case $(uname -s) in
 	Darwin) target="darwin-amd64" ;;
 	*) target="linux-amd64" ;;
@@ -43,10 +50,10 @@ rm "$exe.zip"
 
 echo "okrubik was installed successfully to $exe"
 if [ -x "$(command -v okrubik)" ]; then
-	echo "Run 'okrubik help' to get started"
-else
 	echo "Manually add the directory to your \$HOME/.bash_profile (or similar)"
 	echo "  export RUBIK_INSTALL=\"$okrubik_dir\""
 	echo "  export PATH=\"\$RUBIK_INSTALL/bin:\$PATH\""
-	echo "Run '$exe --help' to get started"
+	echo "Run '$exe help' to get started"
+else
+	echo "Run 'okrubik help' to get started"
 fi
