@@ -1,12 +1,24 @@
 name = "okrubik"
+module = "github.com/rubikorg/okrubik"
 flat = false
+Log = false
 
 [[app]]
-name = "cli"
-path = "./cmd/cli"
+  name = "cli"
+  path = "./cmd/okrubik"
+  watch = false
+  communicate = false
 
 [[app]]
-name = "server"
-path = "./cmd/server"
+  name = "server"
+  path = "./cmd/server"
+  watch = true
+  communicate = false
 
-
+[x]
+  [x.debug]
+    command = "go run main.go"
+    pwd = "cmd/server"
+  [x.cli]
+    command = "go run main.go"
+  	pwd = "cmd/okrubik"
