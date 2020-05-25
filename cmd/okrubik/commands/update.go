@@ -13,7 +13,12 @@ import (
 func Update(args []string) error {
 	if len(args) == 0 {
 		dir, _ := os.Getwd()
-		runTidyCommand(dir)
+		gomod := filepath.Join(".", "go.mod")
+		if f, _ := os.Stat(gomod); f != nil {
+			runTidyCommand(dir)
+		} else {
+			pkg.ErrorMsg("not a Go project")
+		}
 	} else if args[0] == "self" {
 		rubikDir := pkg.MakeAndGetCacheDirPath()
 		installScriptPath := filepath.Join(rubikDir, "install")
