@@ -21,7 +21,7 @@ func main() {
 		mainCmd := args[0]
 
 		// execute command
-		if strings.Contains(mainCmd, "x:") || strings.Contains("exec:") {
+		if strings.Contains(mainCmd, "x:") || strings.Contains(mainCmd, "exec:") {
 			err := commands.Exec(mainCmd)
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
