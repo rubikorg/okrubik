@@ -45,3 +45,7 @@ func genRouterCtl(en interface{}) r.ByteResponse {
 	}
 	return r.Success(compiled, r.Type.JSON)
 }
+
+func errorHTMLCtl(en interface{}) r.ByteResponse {
+	return r.Render(r.Type.Text, nil, "error.html.tpl")
+}
