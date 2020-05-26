@@ -42,8 +42,8 @@ github.com/rubikorg/blocks v0.0.0-20200320142242-f0eb666c9c44/go.mod h1:69qJ18WG
 github.com/rubikorg/blocks v0.0.0-20200522155009-a53511d56543 h1:TS17tsQGfhUbHeweWhE29Zw1SyXzotkXvbQBvBOw3HM=
 github.com/rubikorg/blocks v0.0.0-20200522155009-a53511d56543/go.mod h1:JDn5b6JZXt/9gv7e5m1S2/dGaqCBxNJa0furqt4OOEY=
 github.com/rubikorg/rubik v0.0.0-20200320142558-622c411be4d2/go.mod h1:C6FosWVP314zYfxUJyqXv/9S6eHGwua2pPHOhLIc9UI=
-github.com/rubikorg/rubik v0.0.0-20200526175649-9dde65254120 h1:qrN1QOpIHP6+WYa1hq9O9ZlNMO6Ov3upJCBkZ5yXoQc=
-github.com/rubikorg/rubik v0.0.0-20200526175649-9dde65254120/go.mod h1:C6FosWVP314zYfxUJyqXv/9S6eHGwua2pPHOhLIc9UI=
+github.com/rubikorg/rubik v0.0.0-20200526182117-53dc19f3633d h1:LRdpaRHfHai1VA9LARxfOACJ0gy12xHMaLBODppzqGM=
+github.com/rubikorg/rubik v0.0.0-20200526182117-53dc19f3633d/go.mod h1:C6FosWVP314zYfxUJyqXv/9S6eHGwua2pPHOhLIc9UI=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.1 h1:52QO5WkIUcHGIR7EnGagH88x1bUzqGXTC5/1bDTUQ7U=
 github.com/stretchr/testify v1.2.1/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

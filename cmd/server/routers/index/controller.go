@@ -36,6 +36,6 @@ func swaggerCtl(en interface{}) r.ByteResponse {
 }
 
 func installCtl(en interface{}) r.ByteResponse {
-	return r.Redirect("https://raw.githubusercontent.com/rubikorg/okrubik/master/install")
+	return r.Proxy("https://raw.githubusercontent.com/rubikorg/okrubik/master/install")
 }
 
