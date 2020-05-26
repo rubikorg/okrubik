@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"runtime"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -82,6 +84,13 @@ func Run() error {
 	survey.AskOne(prompt, &answer)
 
 	basePath = strings.Replace(lookup[answer].Path, "./", pwd+sep, 1)
+
+	cpus := runtime.NumCPU()
+	if cfg.MaxProcs > 0 && cfg.MaxProcs <= cpus {
+		cpus = cfg.MaxProcs
+		os.Setenv("GOMAXPROCS", strconv.Itoa(cpus))
+		fmt.Println(fmt.Sprintf("GOMAXPROCS set to %d", cpus))
+	}
 
 	if lookup[answer].Watchable {
 		go runServer(basePath)
