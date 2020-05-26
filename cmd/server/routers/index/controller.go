@@ -34,3 +34,8 @@ func indexCtl(en interface{}) r.ByteResponse {
 func swaggerCtl(en interface{}) r.ByteResponse {
 	return r.Render(r.Type.Text, en, "swagger.html")
 }
+
+func installCtl(en interface{}) r.ByteResponse {
+	return r.Redirect("https://raw.githubusercontent.com/rubikorg/okrubik/master/install")
+}
+

@@ -20,7 +20,13 @@ var indexRoute = r.Route{
 	Controller: indexCtl,
 }
 
+var installRoute = r.Route{
+	Path:       "/install",
+	Controller: installCtl,
+}
+
 func init() {
 	Router.Add(indexRoute)
+	Router.Add(installRoute)
 	// Router.StorageRoutes("gs.zip")
 }
