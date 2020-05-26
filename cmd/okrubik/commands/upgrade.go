@@ -10,7 +10,7 @@ import (
 )
 
 // Update is ran when `okrubik update` is executed
-func Update(args []string) error {
+func Upgrade(args []string) error {
 	if len(args) == 0 {
 		dir, _ := os.Getwd()
 		gomod := filepath.Join(".", "go.mod")

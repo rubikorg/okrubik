@@ -52,7 +52,7 @@ func main() {
 			fmt.Println(replc.HelpCommand([]string{}))
 			break
 		case "upgrade", "u":
-			err := commands.Update(args[1:])
+			err := commands.Upgrade(args[1:])
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
 			}
