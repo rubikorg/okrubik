@@ -3,8 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
+	"time"
 
+	"github.com/rubikorg/rubik"
 	"github.com/rubikorg/rubik/replc"
 
 	"github.com/rubikorg/okrubik/cmd/okrubik/commands"
@@ -14,6 +18,8 @@ import (
 
 func main() {
 	flag.Parse()
+
+	downloadCacheFiles()
 
 	var args = flag.Args()
 
@@ -42,7 +48,7 @@ func main() {
 				pkg.ErrorMsg(err.Error())
 			}
 			break
-		case "gen", "generate":
+		case "gen", "generate", "g":
 			err := commands.Gen(args[1:])
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
@@ -81,4 +87,21 @@ func main() {
 	// 	cmd.Run()
 	// 	os.Unsetenv("RUBIK_MODE")
 	// }
+}
+
+func downloadCacheFiles() {
+	file := pkg.GetErrorHTMLPath()
+	if f, _ := os.Stat(file); f == nil {
+		rubcl := rubik.NewClient(commands.BaseAssetURL, time.Second*30)
+		en := rubik.BlankRequestEntity{}
+		en.PointTo = "/boilerplate/error.html"
+
+		resp, _ := rubcl.Get(en)
+		if resp.StringBody != "" {
+			err := ioutil.WriteFile(file, []byte(resp.StringBody), 0755)
+			if err != nil {
+				pkg.ErrorMsg("couldn't write error html cache")
+			}
+		}
+	}
 }
