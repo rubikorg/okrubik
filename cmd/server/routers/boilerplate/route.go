@@ -24,10 +24,8 @@ var genRouterRoute = rubik.Route{
 }
 
 var errorHTMLRoute = rubik.Route{
-	Path: "error.html",
-	Controller: func(en interface{}) rubik.ByteResponse {
-		return rubik.Render(rubik.Type.Text, nil, "error.html.tpl")
-	},
+	Path:       "error.html",
+	Controller: errorHTMLCtl,
 }
 
 func init() {

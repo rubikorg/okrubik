@@ -47,5 +47,14 @@ func genRouterCtl(en interface{}) r.ByteResponse {
 }
 
 func errorHTMLCtl(en interface{}) r.ByteResponse {
-	return r.Render(r.Type.Text, nil, "error.html.tpl")
+	cacheStore, err := r.Storage.Access("cache")
+	if err != nil {
+		return r.Failure(500, r.E("Error accessing storage cache"))
+	}
+
+	b := cacheStore.Get("error.html")
+	if b != nil {
+		return r.Success(string(b), r.Type.Text)
+	}
+	return r.Failure(500, r.E("Error accessing cache/error.html"))
 }

@@ -113,6 +113,7 @@ func runServer(basePath string) {
 	os.Chdir(basePath)
 	cmd = exec.Command("go", "run", basePath+sep+"main.go")
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
