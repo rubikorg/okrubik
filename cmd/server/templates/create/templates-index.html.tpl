@@ -31,7 +31,7 @@
           <button class="resource-button">🛠 Configuration</button>
         </a>
         <a
-          href="https://rubikorg.github.io/essentials/commands"
+          href="https://rubikorg.github.io/essentials/tooling"
           target="_blank"
         >
           <button class="resource-button">⌨️ Commands</button>
