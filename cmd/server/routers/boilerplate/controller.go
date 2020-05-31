@@ -24,37 +24,39 @@ var genRouterFiles = []string{
 	"controller.tpl",
 }
 
-func createCtl(en interface{}) r.ByteResponse {
+func createCtl(req *r.Request) {
 	var compiled = make(map[string]string)
 	for _, file := range createFiles {
 		joinedPath := filepath.Join("create", file)
-		result := r.Render(r.Type.Text, en, joinedPath).Data
+		result := r.RenderContent(r.Type.Text, req.Entity, joinedPath).Data
 		b, _ := result.([]byte)
 		compiled[file] = string(b)
 	}
-	return r.Success(compiled, r.Type.JSON)
+	req.Respond(compiled, r.Type.JSON)
 }
 
-func genRouterCtl(en interface{}) r.ByteResponse {
+func genRouterCtl(req *r.Request) {
 	var compiled = make(map[string]string)
 	for _, file := range genRouterFiles {
 		joinedPath := filepath.Join("gen", "router", file)
-		result := r.Render(r.Type.Text, en, joinedPath).Data
+		result := r.RenderContent(r.Type.Text, req.Entity, joinedPath).Data
 		b, _ := result.([]byte)
 		compiled[file] = string(b)
 	}
-	return r.Success(compiled, r.Type.JSON)
+	req.Respond(compiled, r.Type.JSON)
 }
 
-func errorHTMLCtl(en interface{}) r.ByteResponse {
+func errorHTMLCtl(req *r.Request) {
 	cacheStore, err := r.Storage.Access("cache")
 	if err != nil {
-		return r.Failure(500, r.E("Error accessing storage cache"))
+		req.Throw(500, r.E("Error accessing storage cache"))
+		return
 	}
 
 	b := cacheStore.Get("error.html")
 	if b != nil {
-		return r.Success(string(b), r.Type.Text)
+		req.Respond(string(b), r.Type.Text)
+		return
 	}
-	return r.Failure(500, r.E("Error accessing cache/error.html"))
+	req.Throw(500, r.E("Error accessing cache/error.html"))
 }
