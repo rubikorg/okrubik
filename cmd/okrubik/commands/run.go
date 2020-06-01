@@ -109,6 +109,8 @@ func Run() error {
 }
 
 func runServer(basePath string) {
+	// sleep for 1 sec for changes to get written
+	time.Sleep(time.Second)
 	// fmt.Println("Setting new commnd", cmd.Process.Pid)
 	os.Chdir(basePath)
 	cmd = exec.Command("go", "run", basePath+sep+"main.go")

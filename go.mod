@@ -7,7 +7,8 @@ require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/printzero/tint v0.0.3
 	github.com/radovskyb/watcher v1.0.7
-	github.com/rubikorg/blocks v0.0.0-20200522155009-a53511d56543
-	github.com/rubikorg/rubik v0.0.0-20200526182117-53dc19f3633d
+	github.com/rubikorg/blocks v0.0.0-20200531124919-d2c49d02e9e9
+	github.com/rubikorg/rubik v0.0.0-20200530203613-7087986886cc
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
+	golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5
 )

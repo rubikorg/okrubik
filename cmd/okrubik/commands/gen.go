@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
+	"go/printer"
 	"go/token"
 	"io/ioutil"
 	"os"
@@ -16,6 +18,7 @@ import (
 	"github.com/rubikorg/okrubik/cmd/okrubik/choose"
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik/pkg"
+	"golang.org/x/tools/go/ast/astutil"
 )
 
 // Gen is code generation method for rubik
@@ -87,25 +90,38 @@ func genRouter(proj pkg.Project, name string) error {
 		}
 	}
 
-	aerr := addAstRouter(filepath.Join(path, "routers"))
+	aerr := addAstRouter(filepath.Join(path, "routers"), name, proj)
 
 	if aerr != nil {
 		return aerr
 	}
 
+	creationOutput("Generated:", filepath.Join("routers", name))
+
 	return nil
 }
 
-func addAstRouter(path string) error {
+func addAstRouter(path, routerName string, proj pkg.Project) error {
+	rubikToml := filepath.Join(".", "rubik.toml")
+	if f, _ := os.Stat(rubikToml); f == nil {
+		return errors.New("Not a rubik project. Cannot find rubik.toml")
+	}
+
+	var config pkg.Config
+	_, err := toml.DecodeFile(rubikToml, &config)
+	if err != nil {
+		return err
+	}
+
 	fset := token.NewFileSet()
+	importFilePath := filepath.Join(path, "import.go")
 	node, err := parser.ParseFile(
-		fset, filepath.Join(path, "import.go"), nil, parser.ParseComments)
+		fset, importFilePath, nil, parser.ParseComments)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Functions:")
 	for _, f := range node.Decls {
 		fn, ok := f.(*ast.FuncDecl)
 		if !ok {
@@ -114,8 +130,34 @@ func addAstRouter(path string) error {
 		if fn.Name.Name == "Import" {
 			// we found the import function
 			// add import of the newly created router
-			// astutil.AddImport(fset, node, "")
-			fmt.Println(fn)
+			importStmt := fmt.Sprintf("%s/cmd/%s/routers/%s", config.Module, proj.Name, routerName)
+			astutil.AddImport(fset, node, importStmt)
+
+			expr, err := parser.ParseExpr(fmt.Sprintf("rubik.Use(%s.Router)", routerName))
+			if err != nil {
+				return err
+			}
+
+			callStmt := ast.ExprStmt{
+				X: expr,
+			}
+			fn.Body.List = append(fn.Body.List, &callStmt)
+
+			var buf bytes.Buffer
+			err = printer.Fprint(&buf, fset, node)
+			if err != nil {
+				return err
+			}
+
+			formatted, err := format.Source(buf.Bytes())
+			if err != nil {
+				return err
+			}
+
+			err = ioutil.WriteFile(importFilePath, formatted, 0755)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
