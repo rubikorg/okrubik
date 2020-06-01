@@ -1,6 +1,7 @@
 name = "okrubik"
 module = "github.com/rubikorg/okrubik"
 flat = false
+maxprocs = 0
 Log = false
 
 [[app]]
@@ -16,13 +17,13 @@ Log = false
   communicate = false
 
 [x]
+  [x.cli]
+    command = "go run main.go"
+    pwd = "cmd/okrubik"
+  [x.debug]
+    command = "go run main.go"
+    pwd = "cmd/server"
   [x.testcli]
     command = "go test ./cmd/okrubik/..."
   [x.testsrv]
     command = "go test ./cmd/server/..."
-  [x.debug]
-    command = "go run main.go"
-    pwd = "cmd/server"
-  [x.cli]
-    command = "go run main.go"
-  	pwd = "cmd/okrubik"

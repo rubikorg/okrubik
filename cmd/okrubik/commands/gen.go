@@ -15,11 +15,75 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/printzero/tint"
 	"github.com/rubikorg/okrubik/cmd/okrubik/choose"
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik/pkg"
+	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/ast/astutil"
 )
+
+var (
+	binName    string
+	binPort    string
+	routerName string
+)
+
+func initGenCmd() *cobra.Command {
+	var genCmd = &cobra.Command{
+		Use:     "gen",
+		Short:   "Generates project code for your Rubik server",
+		Aliases: []string{"g", "generate"},
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(t.Exp(
+				"@(Generate needs a subcommand.) Please do okrubik gen --help for more info",
+				tint.Magenta))
+		},
+	}
+
+	genRouterCmd := &cobra.Command{
+		Use:   "router",
+		Short: "Generate router for an app inside this Rubik workspace",
+		Run: func(cmd *cobra.Command, args []string) {
+			proj, err := choose.RawProject()
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+
+			err = genRouter(proj, routerName)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	genRouterCmd.Flags().StringVarP(
+		&routerName, "name", "n", "", "the name of the router/domain you want to generate")
+	genRouterCmd.MarkFlagRequired("name")
+
+	genBinCmd := &cobra.Command{
+		Use:   "bin",
+		Short: "Generate binary inside this Rubik workspace",
+		Run: func(cmd *cobra.Command, args []string) {
+			err := genBin(binName, binPort)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	genBinCmd.Flags().StringVarP(
+		&binName, "name", "n", "", "the binary name of the server you want to generate")
+	genBinCmd.Flags().StringVarP(
+		&binPort, "port", "p", "", "the port of the server you want to generate")
+	genBinCmd.MarkFlagRequired("name")
+	genBinCmd.MarkFlagRequired("port")
+
+	genCmd.AddCommand(genBinCmd)
+	genCmd.AddCommand(genRouterCmd)
+
+	return genCmd
+}
 
 // Gen is code generation method for rubik
 // it can generate routers and routes

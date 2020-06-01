@@ -7,10 +7,26 @@ import (
 	"path/filepath"
 
 	"github.com/rubikorg/rubik/pkg"
+	"github.com/spf13/cobra"
 )
 
-// Upgrade is ran when `okrubik update` is executed
-func Upgrade(args []string) error {
+func initUpgradeCmd() *cobra.Command {
+	var upgradeCmd = &cobra.Command{
+		Use:   "upgrade",
+		Short: "Upgrade the project dependencies or upgrade self",
+		Run: func(cmd *cobra.Command, args []string) {
+			err := upgrade(args)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	return upgradeCmd
+}
+
+// upgrade is ran when `okrubik update` is executed
+func upgrade(args []string) error {
 	if len(args) == 0 {
 		dir, _ := os.Getwd()
 		gomod := filepath.Join(".", "go.mod")
@@ -24,7 +40,7 @@ func Upgrade(args []string) error {
 		installScriptPath := filepath.Join(rubikDir, "install")
 		mainCmd := "curl"
 		cmd := exec.Command(mainCmd,
-			"https://raw.githubusercontent.com/rubikorg/okrubik/master/install", "-o",
+			"https://rubik.ashishshekar.com/install", "-o",
 			installScriptPath)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
