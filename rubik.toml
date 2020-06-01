@@ -16,6 +16,10 @@ Log = false
   communicate = false
 
 [x]
+  [x.testcli]
+    command = "go test ./cmd/okrubik/..."
+  [x.testsrv]
+    command = "go test ./cmd/server/..."
   [x.debug]
     command = "go run main.go"
     pwd = "cmd/server"

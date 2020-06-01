@@ -9,7 +9,7 @@ import (
 	"github.com/rubikorg/rubik/pkg"
 )
 
-// Update is ran when `okrubik update` is executed
+// Upgrade is ran when `okrubik update` is executed
 func Upgrade(args []string) error {
 	if len(args) == 0 {
 		dir, _ := os.Getwd()

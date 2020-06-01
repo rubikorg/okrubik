@@ -14,12 +14,11 @@ var Router = r.Create("/")
 // 	Name string
 // }
 
-// var indexRoute = r.Route{
-// 	Path:   "/",
-// 	Entity: &iEn{},
-// 	// Entity:     &entity.CreateBoilerplateEntity{},
-// 	Controller: indexCtl,
-// }
+var indexRoute = r.Route{
+	Path: "/",
+	// Entity: &iEn{},
+	Controller: indexCtl,
+}
 
 // var testRoute = r.Route{
 // 	Path:       "/print/:id",
@@ -33,7 +32,7 @@ var installRoute = r.Route{
 }
 
 func init() {
-	// Router.Add(indexRoute)
+	Router.Add(indexRoute)
 	// Router.Add(testRoute)
 	Router.Add(installRoute)
 	// Router.StorageRoutes("gs.zip")

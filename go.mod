@@ -8,7 +8,7 @@ require (
 	github.com/printzero/tint v0.0.3
 	github.com/radovskyb/watcher v1.0.7
 	github.com/rubikorg/blocks v0.0.0-20200601012436-86932686afcc
-	github.com/rubikorg/rubik v0.0.0-20200601011723-1a305bdacac5
+	github.com/rubikorg/rubik v0.0.0-20200601171442-7d1353dd6064
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
-	golang.org/x/tools v0.0.0-20191029190741-b9c20aec41a5
+	golang.org/x/tools v0.0.0-20200530233709-52effbd89c51
 )

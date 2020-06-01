@@ -2,18 +2,33 @@
 
 This project is created by `okrubik` a CLI for Rubik Web Framework.
 
-To start your project simply run the following command:
+### Starting components
 
-cli:
+- cli:
 ```
-okrubik x:cli
+cd cmd/okrubik && go build -o . main.go
+./main
 ```
 
-server:
+- server:
 ```
 okrubik run
 // and select > server from options
 ```
+
+### Testing okrubik
+
+- cli:
+```bash
+okrubik x:testcli
+```
+
+- server
+```bash
+okrubik x:testsrv
+```
+
+
 
 [Getting Started](https://rubikorg.github.io)
 
