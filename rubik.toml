@@ -23,7 +23,9 @@ Log = false
   [x.debug]
     command = "go run main.go"
     pwd = "cmd/server"
+  [x.buildcli]
+    command = "go build -o . cmd/okrubik/main.go"
   [x.testcli]
-    command = "go test ./cmd/okrubik/..."
+    command = "go test -cover ./cmd/okrubik/..."
   [x.testsrv]
-    command = "go test ./cmd/server/..."
+    command = "go test -cover ./cmd/server/..."

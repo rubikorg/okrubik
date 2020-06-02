@@ -29,6 +29,9 @@ var (
 	routerName string
 )
 
+// initGenCmd is code generation method for rubik
+// it can generate routers and routes
+// and entities
 func initGenCmd() *cobra.Command {
 	var genCmd = &cobra.Command{
 		Use:     "gen",
@@ -83,44 +86,6 @@ func initGenCmd() *cobra.Command {
 	genCmd.AddCommand(genRouterCmd)
 
 	return genCmd
-}
-
-// Gen is code generation method for rubik
-// it can generate routers and routes
-// and entities
-func Gen(args []string) error {
-	if len(args) == 0 {
-		return errors.New("gen command requires arguments")
-	}
-
-	switch args[0] {
-	case "bin":
-		if len(args) < 3 {
-			return errors.New("bin requires a name of the binary and a port")
-		}
-		return genBin(args[1], args[2])
-	case "router":
-		if len(args) == 1 {
-			return errors.New("router requires a name to initialize")
-		}
-		// select the project using the project selector
-		proj, err := choose.RawProject()
-		if err != nil {
-			return err
-		}
-		return genRouter(proj, args[1])
-	case "route":
-		// check if router name is given as argument
-		// use ast to write a new route
-		// add it inside init()
-		// create a new controller inside controller.go
-		break
-	case "entity":
-		// check if name of entity given
-		// loop until user enters text "done"
-		break
-	}
-	return nil
 }
 
 func genRouter(proj pkg.Project, name string) error {

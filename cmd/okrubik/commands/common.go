@@ -60,6 +60,7 @@ func Execute() error {
 	rootCmd.AddCommand(initCreateCmd())
 	rootCmd.AddCommand(initRunCmd())
 	rootCmd.AddCommand(initGenCmd())
+	rootCmd.AddCommand(initExecCmd())
 	rootCmd.AddCommand(initUpgradeCmd())
 
 	return rootCmd.Execute()

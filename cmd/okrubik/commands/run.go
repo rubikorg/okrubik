@@ -77,7 +77,10 @@ func run() error {
 				if !ok {
 					return
 				}
+				// sleep for 1 sec for changes to get written
 				pkg.DebugMsg("Restarting rubik server")
+				fmt.Println(t.Exp("@(waiting for a second for changes to complete...)", tint.Yellow))
+				time.Sleep(time.Second)
 				killServer()
 				go runServer(basePath)
 			case err, ok := <-w.Error:
@@ -141,9 +144,6 @@ func run() error {
 }
 
 func runServer(basePath string) {
-	// sleep for 1 sec for changes to get written
-	fmt.Println(t.Exp("@(waiting for a second for changes to complete...)", tint.Yellow))
-	time.Sleep(time.Second)
 	// fmt.Println("Setting new commnd", cmd.Process.Pid)
 	os.Chdir(basePath)
 	cmd = exec.Command("go", "run", basePath+sep+"main.go")
