@@ -12,11 +12,43 @@ import (
 	"github.com/printzero/tint"
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik/pkg"
+	"github.com/spf13/cobra"
 
 	"github.com/AlecAivazis/survey/v2"
 )
 
 var t = tint.Init()
+
+var (
+	cProjName   string
+	cProjModule string
+	cProjPort   string
+)
+
+func initCreateCmd() *cobra.Command {
+	var createCmd = &cobra.Command{
+		Use:     "create",
+		Short:   "Create a new rubik project",
+		Aliases: []string{"c"},
+		Run: func(cmd *cobra.Command, args []string) {
+			var err error
+			if cProjModule != "" && cProjName != "" && cProjPort != "" {
+				err = create(entity.CreateBoilerplateEntity{Name: cProjName, ModulePath: cProjModule, Port: cProjPort})
+			} else {
+				err = create(entity.CreateBoilerplateEntity{})
+			}
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	createCmd.Flags().StringVarP(&cProjName, "name", "n", "", "use this flag to set name of the project")
+	createCmd.Flags().StringVarP(&cProjModule, "module", "m", "", "use this flag to set module path for creation of go.mod")
+	createCmd.Flags().StringVarP(&cProjPort, "port", "p", "", "use this flag to set the port in which rubik will run")
+
+	return createCmd
+}
 
 var createQuestions = []*survey.Question{
 	{
@@ -68,10 +100,17 @@ func prompts() (entity.CreateBoilerplateEntity, error) {
 	return cbe, nil
 }
 
-// Create command main method of the okrubik cli
-func Create() error {
+// create command main method of the okrubik cli
+func create(inp entity.CreateBoilerplateEntity) error {
 	// ask necessary questions
-	cbe, err := prompts()
+	var cbe entity.CreateBoilerplateEntity
+	var err error
+	if inp.Name == "" {
+		cbe, err = prompts()
+	} else {
+		cbe = inp
+	}
+
 	cbe.Bin = "server"
 	if err != nil {
 		return err

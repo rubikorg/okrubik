@@ -14,8 +14,10 @@ import (
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/printzero/tint"
 	"github.com/radovskyb/watcher"
 	"github.com/rubikorg/rubik/pkg"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -25,8 +27,29 @@ const (
 var cmd *exec.Cmd
 var basePath string
 
-// Run is a function for running an app from the rubik.toml file
-func Run() error {
+var appName string
+
+func initRunCmd() *cobra.Command {
+	var runCmd = &cobra.Command{
+		Use:     "run",
+		Short:   "Runs the app created under this workspace",
+		Aliases: []string{"r"},
+		Run: func(cmd *cobra.Command, args []string) {
+			err := run()
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	runCmd.Flags().StringVarP(&appName, "app", "a", "", "use this flag to run the app/service")
+
+	return runCmd
+
+}
+
+// run is a function for running an app from the rubik.toml file
+func run() error {
 	pwd, _ := os.Getwd()
 	cfg := pkg.GetRubikConfig()
 	if cfg.ProjectName == "" {
@@ -54,7 +77,10 @@ func Run() error {
 				if !ok {
 					return
 				}
+				// sleep for 1 sec for changes to get written
 				pkg.DebugMsg("Restarting rubik server")
+				fmt.Println(t.Exp("@(waiting for a second for changes to complete...)", tint.Yellow))
+				time.Sleep(time.Second)
 				killServer()
 				go runServer(basePath)
 			case err, ok := <-w.Error:
@@ -71,6 +97,7 @@ func Run() error {
 	var lookup = make(map[string]pkg.Project)
 	var options = []string{}
 	var answer string
+
 	for _, a := range cfg.App {
 		lookup[a.Name] = a
 		options = append(options, a.Name)
@@ -81,7 +108,15 @@ func Run() error {
 		Options: options,
 	}
 
-	survey.AskOne(prompt, &answer)
+	if appName != "" {
+		if lookup[appName].Name == "" {
+			pkg.ErrorMsg("No such app. Please choose")
+			survey.AskOne(prompt, &answer)
+		}
+		answer = appName
+	} else {
+		survey.AskOne(prompt, &answer)
+	}
 
 	basePath = strings.Replace(lookup[answer].Path, "./", pwd+sep, 1)
 
@@ -109,8 +144,6 @@ func Run() error {
 }
 
 func runServer(basePath string) {
-	// sleep for 1 sec for changes to get written
-	time.Sleep(time.Second)
 	// fmt.Println("Setting new commnd", cmd.Process.Pid)
 	os.Chdir(basePath)
 	cmd = exec.Command("go", "run", basePath+sep+"main.go")
