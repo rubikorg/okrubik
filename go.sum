@@ -107,6 +107,8 @@ github.com/rubikorg/rubik v0.0.0-20200601011723-1a305bdacac5 h1:sPXyiPKpk2J1Ihp0
 github.com/rubikorg/rubik v0.0.0-20200601011723-1a305bdacac5/go.mod h1:C6FosWVP314zYfxUJyqXv/9S6eHGwua2pPHOhLIc9UI=
 github.com/rubikorg/rubik v0.0.0-20200601171442-7d1353dd6064 h1:rOziR4R6Fukpu3hFcm2iUlTuL2e/kFe/QJ/7BmVbocU=
 github.com/rubikorg/rubik v0.0.0-20200601171442-7d1353dd6064/go.mod h1:v/vgy6PwJqys3fm/IGRc3UQugFG69BKP0MA126Xw4q4=
+github.com/rubikorg/rubik v0.2.0 h1:NyQbiE417mIX4plws9TkvArto/0A2ptRvAYITzZ+MMw=
+github.com/rubikorg/rubik v0.2.0/go.mod h1:v/vgy6PwJqys3fm/IGRc3UQugFG69BKP0MA126Xw4q4=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPxbbu5VWo=
