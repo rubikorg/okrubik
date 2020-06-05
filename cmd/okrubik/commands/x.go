@@ -10,15 +10,31 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/rubikorg/rubik/pkg"
+	"github.com/spf13/cobra"
 )
 
-// Exec executes the `okrubik x:test` commands
-func Exec(arg string) error {
-	cmdName := strings.Split(arg, ":")
-	if len(cmdName) < 2 || cmdName[1] == "" {
-		return errors.New("x requires a command after the : symbol")
-	}
+func initExecCmd() *cobra.Command {
+	execCmd := &cobra.Command{
+		Use:     "exec",
+		Short:   "Execute a rubik command defined inside rubik.toml under [x] object",
+		Aliases: []string{"x"},
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) == 0 {
+				pkg.ErrorMsg("exec/x requires a name to execute a command")
+				return
+			}
 
+			err := x(args[0])
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+	return execCmd
+}
+
+// x executes the `okrubik x:test` commands
+func x(arg string) error {
 	var rubikConf pkg.Config
 	tomlPath := filepath.Join(".", "rubik.toml")
 	if f, _ := os.Stat(tomlPath); f == nil {
@@ -30,17 +46,17 @@ func Exec(arg string) error {
 		return err
 	}
 
-	if rubikConf.X[cmdName[1]] == nil {
+	if rubikConf.X[arg] == nil {
 		return errors.New("no such command defined in rubik.toml")
 	}
 
-	cmd := rubikConf.X[cmdName[1]]["command"]
+	cmd := rubikConf.X[arg]["command"]
 	if cmd == "" {
 		return errors.New("a command defined inside x requires `command` variable to be defined")
 	}
 
 	var cmds = []string{}
-	pwd := rubikConf.X[cmdName[1]]["pwd"]
+	pwd := rubikConf.X[arg]["pwd"]
 
 	if strings.Contains(cmd, "&&") {
 		cmds = strings.Split(cmd, "&&")

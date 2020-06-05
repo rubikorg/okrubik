@@ -10,7 +10,7 @@ var Router = rubik.Create("/boilerplate")
 
 var createRoute = rubik.Route{
 	Path:       "/create",
-	Entity:     &entity.CreateBoilerplateEntity{},
+	Entity:     entity.CreateBoilerplateEntity{},
 	Controller: createCtl,
 	ResponseDeclarations: map[int]string{
 		200: "object",
@@ -19,7 +19,7 @@ var createRoute = rubik.Route{
 
 var genRouterRoute = rubik.Route{
 	Path:       "/gen.router",
-	Entity:     &entity.GenRouterEntity{},
+	Entity:     entity.GenRouterEntity{},
 	Controller: genRouterCtl,
 }
 

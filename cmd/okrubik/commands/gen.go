@@ -15,48 +15,77 @@ import (
 	"strings"
 
 	"github.com/BurntSushi/toml"
+	"github.com/printzero/tint"
 	"github.com/rubikorg/okrubik/cmd/okrubik/choose"
 	"github.com/rubikorg/okrubik/pkg/entity"
 	"github.com/rubikorg/rubik/pkg"
+	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/ast/astutil"
 )
 
-// Gen is code generation method for rubik
+var (
+	binName    string
+	binPort    string
+	routerName string
+)
+
+// initGenCmd is code generation method for rubik
 // it can generate routers and routes
 // and entities
-func Gen(args []string) error {
-	if len(args) == 0 {
-		return errors.New("gen command requires arguments")
+func initGenCmd() *cobra.Command {
+	var genCmd = &cobra.Command{
+		Use:     "gen",
+		Short:   "Generates project code for your Rubik server",
+		Aliases: []string{"g", "generate"},
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println(t.Exp(
+				"@(Generate needs a subcommand.) Please do okrubik gen --help for more info",
+				tint.Magenta))
+		},
 	}
 
-	switch args[0] {
-	case "bin":
-		if len(args) < 3 {
-			return errors.New("bin requires a name of the binary and a port")
-		}
-		return genBin(args[1], args[2])
-	case "router":
-		if len(args) == 1 {
-			return errors.New("router requires a name to initialize")
-		}
-		// select the project using the project selector
-		proj, err := choose.RawProject()
-		if err != nil {
-			return err
-		}
-		return genRouter(proj, args[1])
-	case "route":
-		// check if router name is given as argument
-		// use ast to write a new route
-		// add it inside init()
-		// create a new controller inside controller.go
-		break
-	case "entity":
-		// check if name of entity given
-		// loop until user enters text "done"
-		break
+	genRouterCmd := &cobra.Command{
+		Use:   "router",
+		Short: "Generate router for an app inside this Rubik workspace",
+		Run: func(cmd *cobra.Command, args []string) {
+			proj, err := choose.RawProject()
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+
+			err = genRouter(proj, routerName)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
 	}
-	return nil
+
+	genRouterCmd.Flags().StringVarP(
+		&routerName, "name", "n", "", "the name of the router/domain you want to generate")
+	genRouterCmd.MarkFlagRequired("name")
+
+	genBinCmd := &cobra.Command{
+		Use:   "bin",
+		Short: "Generate binary inside this Rubik workspace",
+		Run: func(cmd *cobra.Command, args []string) {
+			err := genBin(binName, binPort)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	genBinCmd.Flags().StringVarP(
+		&binName, "name", "n", "", "the binary name of the server you want to generate")
+	genBinCmd.Flags().StringVarP(
+		&binPort, "port", "p", "", "the port of the server you want to generate")
+	genBinCmd.MarkFlagRequired("name")
+	genBinCmd.MarkFlagRequired("port")
+
+	genCmd.AddCommand(genBinCmd)
+	genCmd.AddCommand(genRouterCmd)
+
+	return genCmd
 }
 
 func genRouter(proj pkg.Project, name string) error {

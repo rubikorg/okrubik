@@ -5,27 +5,28 @@ This project is created by `okrubik` a CLI for Rubik Web Framework.
 ### Starting components
 
 - cli:
-```
-cd cmd/okrubik && go build -o . main.go
+```bash
+okrubik x buildcli # OR
+go build -o . cmd/okrubik/main.go
+# run binary
 ./main
 ```
 
 - server:
-```
-okrubik run
-// and select > server from options
+```bash
+okrubik run -a server
 ```
 
 ### Testing okrubik
 
 - cli:
 ```bash
-okrubik x:testcli
+okrubik x testcli
 ```
 
 - server
 ```bash
-okrubik x:testsrv
+okrubik x testsrv
 ```
 
 
