@@ -1,3 +1,5 @@
+// +build windows
+
 package commands
 
 import (
@@ -10,7 +12,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/AlecAivazis/survey/v2"
@@ -149,9 +150,6 @@ func runServer(basePath string) {
 	cmd = exec.Command("go", "run", basePath+sep+"main.go")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Setsid: true,
-	}
 	cmd.Run()
 }
 
