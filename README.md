@@ -1,5 +1,7 @@
 # okrubik
 
+[![Actions Status](https://github.com/rubikorg/okrubik/workflows/CLI/badge.svg)](https://github.com/rubikorg/okrubik/actions)
+
 This project is created by `okrubik` a CLI for Rubik Web Framework.
 
 ### Starting components
