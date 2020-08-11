@@ -11,6 +11,7 @@ import (
 	"go/token"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
@@ -27,6 +28,7 @@ var (
 	binName    string
 	binPort    string
 	routerName string
+	routeName  string
 )
 
 // initGenCmd is code generation method for rubik
@@ -39,8 +41,8 @@ func initGenCmd() *cobra.Command {
 		Aliases: []string{"g", "generate"},
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println(t.Exp(
-				"@(Generate needs a subcommand.) Please do okrubik gen --help for more info",
-				tint.Magenta))
+				"Generate needs a subcommand. Please do @(okrubik gen --help) for more info",
+				tint.BgMagenta.Bold().Add(tint.White)))
 		},
 	}
 
@@ -82,15 +84,38 @@ func initGenCmd() *cobra.Command {
 	genBinCmd.MarkFlagRequired("name")
 	genBinCmd.MarkFlagRequired("port")
 
+	genRouteCmd := &cobra.Command{
+		Use:   "route",
+		Short: "Generate new route for Rubik app",
+		Run: func(cmd *cobra.Command, args []string) {
+			if routerName == "" || routeName == "" {
+				pkg.ErrorMsg("generating a 'route' requires -r and -n arguments. " +
+					"do 'okrubik gen route --help' for more info")
+				return
+			}
+			proj, err := choose.RawProject()
+			err = genRoute(proj)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	genRouteCmd.Flags().StringVarP(
+		&routerName, "router", "r", "", "router name to generate new route")
+	genRouteCmd.Flags().StringVarP(
+		&routeName, "name", "n", "", "name of the route")
+
 	genCmd.AddCommand(genBinCmd)
 	genCmd.AddCommand(genRouterCmd)
+	genCmd.AddCommand(genRouteCmd)
 
 	return genCmd
 }
 
 func genRouter(proj pkg.Project, name string) error {
 	pwd, _ := os.Getwd()
-	path := strings.ReplaceAll(proj.Path, "./", pwd+sep)
+	path := strings.ReplaceAll(proj.Path, ".", pwd)
 	routerPath := filepath.Join(path, "routers", name)
 	if f, _ := os.Stat(routerPath); f != nil {
 		return errors.New("router with name `" + name + "` already exists")
@@ -264,6 +289,36 @@ func genBin(name, port string) error {
 	if err := ioutil.WriteFile(rubikToml, buf.Bytes(), 0755); err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func genRoute(proj pkg.Project) error {
+	routerPath := path.Join(".", "cmd", proj.Name, "routers", routerName)
+	if fi, _ := os.Stat(routerPath); fi == nil {
+		msg := fmt.Sprintf("could not find router %s", routerName)
+		return errors.New(msg)
+	}
+
+	routeFilePath := path.Join(routerPath, "route.go")
+	// ctlFilePath :=path.Join(routerPath, "controller.go")
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, routeFilePath, nil, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+
+	for _, f := range node.Decls {
+		fmt.Printf("%#v\n\n", f)
+	}
+
+	exp, err := parser.ParseExpr(`type A struct { 
+		Name string 
+		}`)
+	if err != nil {
+		return err
+	}
+	fmt.Println(exp)
 
 	return nil
 }
