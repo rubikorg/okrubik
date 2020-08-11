@@ -57,11 +57,12 @@ Complete documentation is available at https://rubikorg.github.io`,
 
 // Execute cobra root command
 func Execute() error {
-	rootCmd.AddCommand(initCreateCmd())
+	rootCmd.AddCommand(initNewCmd())
 	rootCmd.AddCommand(initRunCmd())
 	rootCmd.AddCommand(initGenCmd())
 	rootCmd.AddCommand(initExecCmd())
 	rootCmd.AddCommand(initUpgradeCmd())
+	rootCmd.AddCommand(initBundleCommand())
 
 	return rootCmd.Execute()
 }
