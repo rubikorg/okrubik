@@ -9,7 +9,7 @@ var Router = r.Create("/")
 
 var indexRoute = r.Route{
 	Path:       "/",
-	Controller: indexCtl(),
+	Controller: indexCtl,
 }
 
 func init() {

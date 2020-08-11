@@ -1,6 +1,6 @@
 package config
 
 type ProjectConfig struct {
-	Port  string `toml:"port"`
+	Port  int    `toml:"port"`
 	Bench string `toml:"bench"`
 }

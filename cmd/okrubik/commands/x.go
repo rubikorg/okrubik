@@ -2,7 +2,6 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -77,7 +76,6 @@ func x(arg string) error {
 	// TODO: fix multiple command working
 	for _, c := range cmds {
 		fullCmd := strings.Split(strings.Trim(c, ""), " ")
-		fmt.Println(fullCmd[0], fullCmd[1:])
 		cmdToRun := exec.Command(fullCmd[0], fullCmd[1:]...)
 		cmdToRun.Stdout = os.Stdout
 		cmdToRun.Stderr = os.Stderr

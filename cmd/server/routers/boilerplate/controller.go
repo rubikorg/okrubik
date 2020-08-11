@@ -7,7 +7,8 @@ import (
 )
 
 var createFiles = []string{
-	"config-decl.go.tpl",
+	"app-config.go.tpl",
+	"app-dep.go.tpl",
 	"routers-index-controller.go.tpl",
 	"main.go.tpl",
 	"rubik.toml.tpl",
@@ -32,6 +33,7 @@ func createCtl(req *r.Request) {
 		b, _ := result.([]byte)
 		compiled[file] = string(b)
 	}
+
 	req.Respond(compiled, r.Type.JSON)
 }
 

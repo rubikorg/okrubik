@@ -1,1 +1,2 @@
-port = ":{{ .Port }}"
+port = {{ .Port }}
+host = '127.0.0.1'
