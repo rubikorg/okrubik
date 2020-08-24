@@ -7,11 +7,11 @@ import (
 // Router for /{{ .RouterName }} routes
 var Router = r.Create("/{{ .RouterName }}")
 
-var indexRoute = r.Route{
-	Path:       "/",
-	Controller: indexCtl,
-}
-
 func init() {
+	indexRoute = r.Route{
+		Path:       "/",
+		Controller: indexCtl,
+	}
+	
 	Router.Add(indexRoute)
 }

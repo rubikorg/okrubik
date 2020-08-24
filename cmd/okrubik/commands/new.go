@@ -16,7 +16,12 @@ import (
 )
 
 var t = tint.Init()
+var postCreationText = `
+Done! To start the server, run:
 
+cd %s
+okrubik run
+`
 var (
 	cProjName   string
 	cProjModule string
@@ -120,7 +125,7 @@ func create(inp entity.CreateBoilerplateEntity) error {
 
 	runTidyCommand(inp.Name)
 
-	fmt.Println("Done! Run command: okrubik run")
+	fmt.Printf(postCreationText+"\n", inp.Name)
 
 	return nil
 }

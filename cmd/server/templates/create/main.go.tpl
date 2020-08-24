@@ -16,7 +16,9 @@ func main() {
 
 	// TODO: set your one-time application level dependency here
 	// eg: DB Connection, Logger etc..
-	app.SetDep(app.Dependency{})
+	app.SetDep(app.Dependency{
+		ProjectConfig: config,
+	})
 
 	routers.Import()
 	panic(r.Run())

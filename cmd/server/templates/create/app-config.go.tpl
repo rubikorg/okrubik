@@ -1,4 +1,4 @@
-package config
+package app
 
 // ProjectConfig defines your server related configuration
 type ProjectConfig struct {

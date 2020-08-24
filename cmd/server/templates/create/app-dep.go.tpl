@@ -2,7 +2,7 @@ package app
 
 // Dependency of routers and their controllers
 type Dependency struct {
-    // TODO: add your application level dependency here
+    ProjectConfig
 }
 
 var dep Dependency
