@@ -51,7 +51,8 @@ common tasks and functions and provides ease of REST API development.
 Complete documentation is available at https://rubikorg.github.io`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Do Stuff Here
-		fmt.Println(t.Exp("@(Welcome to Rubik Command-Line Manager) use --help for help text", tint.Magenta))
+		fmt.Println(t.Exp("@(Welcome to Rubik Command-Line Manager) use --help for help text",
+			tint.Magenta))
 	},
 }
 
@@ -62,7 +63,7 @@ func Execute() error {
 	rootCmd.AddCommand(initGenCmd())
 	rootCmd.AddCommand(initExecCmd())
 	rootCmd.AddCommand(initUpgradeCmd())
-	rootCmd.AddCommand(initBundleCommand())
+	// rootCmd.AddCommand(initBundleCommand())
 
 	return rootCmd.Execute()
 }
