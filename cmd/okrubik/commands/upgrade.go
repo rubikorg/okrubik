@@ -25,7 +25,7 @@ func initUpgradeCmd() *cobra.Command {
 	return upgradeCmd
 }
 
-// upgrade is ran when `okrubik update` is executed
+// upgrade is ran when `okrubik upgrade` is executed
 func upgrade(args []string) error {
 	if len(args) == 0 {
 		dir, _ := os.Getwd()

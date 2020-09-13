@@ -67,8 +67,8 @@ func initGenCmd() *cobra.Command {
 	genRouterCmd.MarkFlagRequired("name")
 
 	genBinCmd := &cobra.Command{
-		Use:   "bin",
-		Short: "Generate binary inside this Rubik workspace",
+		Use:   "service",
+		Short: "Generate service binary inside this Rubik workspace",
 		Run: func(cmd *cobra.Command, args []string) {
 			err := genBin(binName, binPort)
 			if err != nil {
@@ -144,7 +144,7 @@ func genRouter(proj pkg.Project, name string) error {
 		}
 	}
 
-	aerr := addAstRouter(filepath.Join(path, "routers"), name, proj)
+	aerr := addRouterToAST(filepath.Join(path, "routers"), name, proj)
 
 	if aerr != nil {
 		return aerr
@@ -155,7 +155,7 @@ func genRouter(proj pkg.Project, name string) error {
 	return nil
 }
 
-func addAstRouter(path, routerName string, proj pkg.Project) error {
+func addRouterToAST(path, routerName string, proj pkg.Project) error {
 	rubikToml := filepath.Join(".", "rubik.toml")
 	if f, _ := os.Stat(rubikToml); f == nil {
 		return errors.New("Not a rubik project. Cannot find rubik.toml")
@@ -301,7 +301,70 @@ func genRoute(proj pkg.Project) error {
 	}
 
 	routeFilePath := path.Join(routerPath, "route.go")
-	// ctlFilePath :=path.Join(routerPath, "controller.go")
+	ctlFilePath := path.Join(routerPath, "controller.go")
+
+	// check if a rubik.Route with same name is present inside the given router
+	if exists, err := checkIfRouteExists(routeFilePath, routeName); exists {
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("%sRoute already exists", routeName)
+	}
+
+	err := addRouteToAST(routeFilePath, routeName)
+	if err != nil {
+		return err
+	}
+
+	err = addControllerToAST(ctlFilePath, routeName)
+	if err != nil {
+		return err
+	}
+
+	colored := t.Exp(fmt.Sprintf("@(%s Route) generated inside @(%s)!", routeName, routerName),
+		tint.Magenta, tint.Green.Bold())
+	fmt.Println(colored)
+
+	return nil
+}
+
+func checkIfRouteExists(routeFilePath, rrouteName string) (bool, error) {
+	// TODO: fset and parsing node is same accross all funcs ..extract it!
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, routeFilePath, nil, parser.ParseComments)
+	if err != nil {
+		return true, err
+	}
+
+	var fileBuf bytes.Buffer
+	err = printer.Fprint(&fileBuf, fset, node)
+	if err != nil {
+		return true, err
+	}
+
+	fileContents := string(fileBuf.Bytes())
+
+	for _, f := range node.Decls {
+		fn, ok := f.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+
+		if fn.Name.Name == "init" {
+			for _, s := range fn.Body.List {
+				if expr, ok := s.(*ast.ExprStmt); ok {
+					if strings.Contains(fileContents[expr.X.Pos():expr.X.End()],
+						fmt.Sprintf("%sRoute", rrouteName)) {
+						return true, nil
+					}
+				}
+			}
+		}
+	}
+	return false, nil
+}
+
+func addRouteToAST(routeFilePath, rrouteName string) error {
 	fset := token.NewFileSet()
 	node, err := parser.ParseFile(fset, routeFilePath, nil, parser.ParseComments)
 	if err != nil {
@@ -309,16 +372,109 @@ func genRoute(proj pkg.Project) error {
 	}
 
 	for _, f := range node.Decls {
-		fmt.Printf("%#v\n\n", f)
-	}
+		fn, ok := f.(*ast.FuncDecl)
+		if !ok {
+			continue
+		}
+		if fn.Name.Name == "init" {
+			routeDecl := fmt.Sprintf(`r.Route{Path: "/%s",Controller: %sCtl}`,
+				rrouteName, rrouteName)
 
-	exp, err := parser.ParseExpr(`type A struct { 
-		Name string 
-		}`)
+			expr, err := parser.ParseExpr(routeDecl)
+			routeAssignStmt := ast.AssignStmt{
+				Tok: token.DEFINE,
+				Lhs: []ast.Expr{
+					&ast.Ident{
+						Name: fmt.Sprintf("%sRoute", rrouteName),
+					},
+				},
+				Rhs: []ast.Expr{expr},
+			}
+
+			addExpr, err := parser.ParseExpr(fmt.Sprintf("Router.Add(%sRoute)", rrouteName))
+			if err != nil {
+				return err
+			}
+			rubikAddStmt := ast.ExprStmt{
+				X: addExpr,
+			}
+
+			fn.Body.List = append(fn.Body.List, &routeAssignStmt)
+			fn.Body.List = append(fn.Body.List, &rubikAddStmt)
+			if err != nil {
+				return err
+			}
+			var buf bytes.Buffer
+			err = printer.Fprint(&buf, fset, node)
+			if err != nil {
+				return err
+			}
+
+			formatted, err := format.Source(buf.Bytes())
+			err = ioutil.WriteFile(routeFilePath, formatted, 0755)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func addControllerToAST(controllerFilePath, ctlRouteName string) error {
+	fset := token.NewFileSet()
+	node, err := parser.ParseFile(fset, controllerFilePath, nil, parser.ParseComments)
 	if err != nil {
 		return err
 	}
-	fmt.Println(exp)
 
+	ctlParamIdent := []*ast.Ident{
+		{
+			Name: "req",
+		},
+	}
+
+	reqTypeExpr, err := parser.ParseExpr("*r.Request")
+	if err != nil {
+		return err
+	}
+
+	fnBodyExpr, err := parser.ParseExpr(fmt.Sprintf(`req.Respond("I am %s controller!")`,
+		ctlRouteName))
+
+	ctlIncomingFields := []*ast.Field{
+		{
+			Names: ctlParamIdent,
+			Type:  reqTypeExpr,
+		},
+	}
+	ctlDecl := ast.FuncDecl{
+		Name: &ast.Ident{Name: fmt.Sprintf("%sCtl", ctlRouteName)},
+		Recv: nil,
+		Type: &ast.FuncType{
+			Params: &ast.FieldList{
+				List: ctlIncomingFields,
+			},
+		},
+		Body: &ast.BlockStmt{
+			List: []ast.Stmt{
+				&ast.ExprStmt{
+					X: fnBodyExpr,
+				},
+			},
+		},
+	}
+
+	node.Decls = append(node.Decls, &ctlDecl)
+	var buf bytes.Buffer
+	err = printer.Fprint(&buf, fset, node)
+	if err != nil {
+		return err
+	}
+
+	formatted, err := format.Source(buf.Bytes())
+	err = ioutil.WriteFile(controllerFilePath, formatted, 0755)
+	if err != nil {
+		return err
+	}
 	return nil
 }
