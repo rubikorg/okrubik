@@ -21,6 +21,7 @@ func main() {
 	})
 
 	routers.Import()
-	panic(r.Run())
-
+	if err := r.Run(); err != nil {
+		panic(err)
+	}
 }
