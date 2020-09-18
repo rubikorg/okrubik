@@ -29,7 +29,7 @@ var (
 	basePath           string
 	appName            string
 	build              bool
-	extMode            bool
+	pluginMode         bool
 	runExtBeforeServer bool
 )
 
@@ -39,8 +39,8 @@ func initRunCmd() *cobra.Command {
 		Short:   "Runs the app created under this workspace",
 		Aliases: []string{"r"},
 		Run: func(cmd *cobra.Command, args []string) {
-			if extMode || runExtBeforeServer {
-				err := runExt()
+			if pluginMode || runExtBeforeServer {
+				err := runPlugins()
 				if err != nil {
 					pkg.ErrorMsg(err.Error())
 				}
@@ -57,7 +57,7 @@ func initRunCmd() *cobra.Command {
 	runCmd.Flags().StringVarP(&appName, "app", "a", "", "use this flag to run the app/service")
 	runCmd.Flags().BoolVarP(&build, "build", "b", false,
 		"build a target binary and run the app/service")
-	runCmd.Flags().BoolVarP(&extMode, "plugins", "", false,
+	runCmd.Flags().BoolVarP(&pluginMode, "plugins", "", false,
 		"use this flags to run Rubik extension blocks")
 
 	// runCmd.Flags().BoolVarP(&runExtBeforeServer, "run-ext", "", false,
@@ -192,8 +192,8 @@ func killServer() {
 	syscall.Kill(-pgid, syscall.SIGINT)
 }
 
-func runExt() error {
-	os.Setenv("RUBIK_ENV", "ext")
+func runPlugins() error {
+	os.Setenv("RUBIK_ENV", "plugin")
 	proj, err := choose.RawProject()
 	if err != nil || proj.Name == "" {
 		return err
