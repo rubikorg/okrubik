@@ -57,11 +57,11 @@ func initRunCmd() *cobra.Command {
 	runCmd.Flags().StringVarP(&appName, "app", "a", "", "use this flag to run the app/service")
 	runCmd.Flags().BoolVarP(&build, "build", "b", false,
 		"build a target binary and run the app/service")
-	runCmd.Flags().BoolVarP(&extMode, "ext", "", false,
+	runCmd.Flags().BoolVarP(&extMode, "plugins", "", false,
 		"use this flags to run Rubik extension blocks")
 
-	runCmd.Flags().BoolVarP(&runExtBeforeServer, "run-ext", "", false,
-		"use this flags to run Rubik extentions first and start the server ")
+	// runCmd.Flags().BoolVarP(&runExtBeforeServer, "run-ext", "", false,
+	// 	"use this flags to run Rubik extentions first and start the server ")
 
 	return runCmd
 
