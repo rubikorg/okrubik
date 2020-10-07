@@ -29,8 +29,9 @@ var (
 	basePath           string
 	appName            string
 	build              bool
-	pluginMode         bool
+	pluginName         string
 	runExtBeforeServer bool
+	args               string
 )
 
 func initRunCmd() *cobra.Command {
@@ -39,7 +40,7 @@ func initRunCmd() *cobra.Command {
 		Short:   "Runs the app created under this workspace",
 		Aliases: []string{"r"},
 		Run: func(cmd *cobra.Command, args []string) {
-			if pluginMode || runExtBeforeServer {
+			if pluginName != "" {
 				err := runPlugins()
 				if err != nil {
 					pkg.ErrorMsg(err.Error())
@@ -55,10 +56,13 @@ func initRunCmd() *cobra.Command {
 	}
 
 	runCmd.Flags().StringVarP(&appName, "app", "a", "", "use this flag to run the app/service")
-	runCmd.Flags().BoolVarP(&build, "build", "b", false,
-		"build a target binary and run the app/service")
-	runCmd.Flags().BoolVarP(&pluginMode, "plugins", "", false,
+	// TODO: add this feature in the future release
+	// runCmd.Flags().BoolVarP(&build, "build", "b", false,
+	// 	"build a target binary and run the app/service")
+	runCmd.Flags().StringVarP(&pluginName, "plugin", "p", "",
 		"use this flags to run Rubik extension blocks")
+	runCmd.Flags().StringVarP(&args, "args", "v", "",
+		"arguments passed to the plugins/blocks to make it flexible")
 
 	// runCmd.Flags().BoolVarP(&runExtBeforeServer, "run-ext", "", false,
 	// 	"use this flags to run Rubik extentions first and start the server ")
@@ -193,17 +197,40 @@ func killServer() {
 }
 
 func runPlugins() error {
+	var proj pkg.Project
 	os.Setenv("RUBIK_ENV", "plugin")
-	proj, err := choose.RawProject()
-	if err != nil || proj.Name == "" {
-		return err
+	if appName == "" {
+		var err error
+		proj, err = choose.RawProject()
+		if err != nil || proj.Name == "" {
+			return err
+		}
+	} else {
+		cfg := pkg.GetRubikConfig()
+		if cfg.ProjectName == "" {
+			return errors.New("not a valid rubik config")
+		}
+
+		for _, a := range cfg.App {
+			if a.Name == appName {
+				proj = a
+			}
+		}
+
+		if proj.Name == "" {
+			return fmt.Errorf("%s does not exists in this workspace", appName)
+		}
 	}
 
+	os.Setenv("RUBIK_PROJ", proj.Name)
+	os.Setenv("RUBIK_ARGS", args)
+	os.Setenv("RUBIK_PLUGIN", pluginName)
 	pwd, _ := os.Getwd()
 	path := strings.ReplaceAll(proj.Path, ".", pwd)
 	runServer(path)
 
 	os.Setenv("RUBIK_ENV", "")
+	os.Setenv("RUBIK_PROJ", "")
 
 	if runExtBeforeServer {
 		err := run(path)
