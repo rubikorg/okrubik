@@ -63,6 +63,7 @@ func Execute() error {
 	rootCmd.AddCommand(initGenCmd())
 	rootCmd.AddCommand(initExecCmd())
 	rootCmd.AddCommand(initUpgradeCmd())
+	rootCmd.AddCommand(initTestCmd())
 	// rootCmd.AddCommand(initBundleCommand())
 
 	return rootCmd.Execute()
