@@ -14,6 +14,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"text/template"
+	"unicode"
 
 	"github.com/BurntSushi/toml"
 	"github.com/printzero/tint"
@@ -25,11 +27,54 @@ import (
 )
 
 var (
-	binName    string
-	binPort    string
-	routerName string
-	routeName  string
+	binName     string
+	binPort     string
+	routerName  string
+	routeName   string
+	entityName  string
+	genAppName  string
+	writeEntity bool
 )
+
+// ControllerTestTemplate is used to generate a test function
+var ControllerTestTemplate = `
+func Test{{ .Name }}Route(t *testing.T) {
+	// TODO: replace this with your own Entity
+	testEntity := struct {
+		rubik.Entity
+	}
+	testEntity.PointTo = "/"
+	rr := probe.Test(testEntity)
+	if rr.Body.String() != "hello rubik" {
+		t.Error("I'm a failing test!!")
+	}
+}`
+
+// EntityTemplate is used to create an entity file from the okrubik gen command
+var EntityTemplate = `package entity
+
+import "github.com/rubikorg/rubik"
+
+// {{ .N }}Entity implements rubik.TestableEntity
+type {{ .N }}Entity struct {
+	rubik.Entity
+	{{- range $k, $v := .M }}
+	{{ $k }} {{ $v }}
+	{{- end }}
+}
+
+func (en {{ .N }}Entity) ComposedEntity() rubik.Entity {
+	return en.Entity
+}
+
+func (en {{ .N }}Entity) CoreEntity() interface{} {
+	return en
+}
+
+func (en {{ .N }}Entity) Path() string {
+	return en.PointTo
+}
+`
 
 // initGenCmd is code generation method for rubik
 // it can generate routers and routes
@@ -66,7 +111,7 @@ func initGenCmd() *cobra.Command {
 		&routerName, "name", "n", "", "the name of the router/domain you want to generate")
 	genRouterCmd.MarkFlagRequired("name")
 
-	genBinCmd := &cobra.Command{
+	genServiceCmd := &cobra.Command{
 		Use:   "service",
 		Short: "Generate service binary inside this Rubik workspace",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -77,12 +122,12 @@ func initGenCmd() *cobra.Command {
 		},
 	}
 
-	genBinCmd.Flags().StringVarP(
+	genServiceCmd.Flags().StringVarP(
 		&binName, "name", "n", "", "the binary name of the server you want to generate")
-	genBinCmd.Flags().StringVarP(
+	genServiceCmd.Flags().StringVarP(
 		&binPort, "port", "p", "", "the port of the server you want to generate")
-	genBinCmd.MarkFlagRequired("name")
-	genBinCmd.MarkFlagRequired("port")
+	genServiceCmd.MarkFlagRequired("name")
+	genServiceCmd.MarkFlagRequired("port")
 
 	genRouteCmd := &cobra.Command{
 		Use:   "route",
@@ -105,10 +150,36 @@ func initGenCmd() *cobra.Command {
 		&routerName, "router", "r", "", "router name to generate new route")
 	genRouteCmd.Flags().StringVarP(
 		&routeName, "name", "n", "", "name of the route")
+	// TODO: we need to enable this feature in the future :P (now always create new entity)
+	// genRouteCmd.Flags().BoolVarP(
+	// 	&writeEntity, "entity", "e", false, "flag to generate entity with the route")
+	// genRouteCmd.Flags().StringVarP(
+	// 		&routeName, "input-entity", "i", "",
+	// 		"name of the existing entity present inside the pkg/entity folder")
 
-	genCmd.AddCommand(genBinCmd)
+	genEntityCmd := &cobra.Command{
+		Use:   "entity",
+		Short: "Generate a new entity for a Rubik API",
+		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) == 0 || len(args) < 2 {
+				pkg.ErrorMsg("Entity generator requires you to specify Entity name and Entity data")
+				return
+			}
+
+			err := genEntity(args[0], genAppName, args[1])
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
+			}
+		},
+	}
+
+	genEntityCmd.Flags().StringVarP(
+		&genAppName, "app", "a", "", "the app for which you want to generate the Entity")
+
+	genCmd.AddCommand(genServiceCmd)
 	genCmd.AddCommand(genRouterCmd)
 	genCmd.AddCommand(genRouteCmd)
+	genCmd.AddCommand(genEntityCmd)
 
 	return genCmd
 }
@@ -311,7 +382,12 @@ func genRoute(proj pkg.Project) error {
 		return fmt.Errorf("%sRoute already exists", routeName)
 	}
 
-	err := addRouteToAST(routeFilePath, routeName)
+	err := genEntity(routeName, proj.Name, "")
+	if err != nil {
+		return err
+	}
+
+	err = addRouteToAST(routeFilePath, routeName)
 	if err != nil {
 		return err
 	}
@@ -371,14 +447,19 @@ func addRouteToAST(routeFilePath, rrouteName string) error {
 		return err
 	}
 
+	rconf := pkg.GetRubikConfig()
+	importStmt := fmt.Sprintf("%s/pkg/entity", rconf.Module)
+	astutil.AddImport(fset, node, importStmt)
+
 	for _, f := range node.Decls {
 		fn, ok := f.(*ast.FuncDecl)
 		if !ok {
 			continue
 		}
 		if fn.Name.Name == "init" {
-			routeDecl := fmt.Sprintf(`r.Route{Path: "/%s",Controller: %sCtl}`,
-				rrouteName, rrouteName)
+			routeDecl := fmt.Sprintf(
+				`r.Route{Path: "/%s", Entity: entity.%sEntity{}, Controller: %sCtl}`,
+				rrouteName, capitalize(rrouteName), rrouteName)
 
 			expr, err := parser.ParseExpr(routeDecl)
 			routeAssignStmt := ast.AssignStmt{
@@ -477,4 +558,86 @@ func addControllerToAST(controllerFilePath, ctlRouteName string) error {
 		return err
 	}
 	return nil
+}
+
+func genEntity(en, app, data string) error {
+	var proj pkg.Project
+	// TODO: this whole if-else can be abstracted out into a function
+	if app == "" {
+		var err error
+		proj, err = choose.RawProject()
+		if err != nil {
+			return err
+		}
+	} else {
+		config := pkg.GetRubikConfig()
+		if config.Module == "" {
+			return errors.New("not a valid Rubik project")
+		}
+
+		for _, a := range config.App {
+			if a.Name == app {
+				proj = a
+			}
+		}
+
+		if proj.Name == "" {
+			return fmt.Errorf("Project: %s not found in this Rubik workspace", app)
+		}
+	}
+
+	pwd, _ := os.Getwd()
+	entityPath := filepath.Join(pwd, "pkg", "entity", fmt.Sprintf(
+		"%s.entity.go", strings.ToLower(en)))
+	structData := parseEntityData(data)
+	tpl, err := template.New("entity").Parse(EntityTemplate)
+	if err != nil {
+		return err
+	}
+
+	var buf bytes.Buffer
+	type tplData = struct {
+		N string
+		M map[string]string
+	}
+	err = tpl.Execute(&buf, tplData{N: capitalize(en), M: structData})
+	if err != nil {
+		return err
+	}
+
+	if f, _ := os.Stat(filepath.Join(pwd, "pkg", "entity")); f == nil {
+		os.MkdirAll(filepath.Join(pwd, "pkg", "entity"), 0755)
+	}
+
+	err = ioutil.WriteFile(entityPath, buf.Bytes(), 0755)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func parseEntityData(dataArg string) map[string]string {
+	data := make(map[string]string)
+	if strings.Contains(dataArg, ",") {
+		members := strings.Split(dataArg, ",")
+		for _, m := range members {
+			// TODO: add check/validation if given type is a Go type
+			d := strings.Split(strings.Trim(m, " "), " ")
+			member := capitalize(d[0])
+			data[member] = d[1]
+		}
+	} else if strings.Contains(dataArg, " ") {
+		d := strings.Split(dataArg, " ")
+		member := capitalize(d[0])
+		data[member] = d[1]
+	}
+	return data
+}
+
+// TODO: keep this function somewhere common
+func capitalize(target string) string {
+	r := []rune(target)
+	r[0] = unicode.ToUpper(r[0])
+	return string(r)
 }
