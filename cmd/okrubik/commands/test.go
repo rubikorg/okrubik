@@ -17,7 +17,7 @@ var (
 func initTestCmd() *cobra.Command {
 	testCmd := cobra.Command{
 		Use:     "test",
-		Short:   "Run and generate tests for your services",
+		Short:   "Run the tests inside your services",
 		Aliases: []string{"t"},
 		Run: func(cmd *cobra.Command, args []string) {
 			if allFlag {

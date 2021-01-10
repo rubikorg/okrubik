@@ -174,12 +174,36 @@ func initGenCmd() *cobra.Command {
 	}
 
 	genEntityCmd.Flags().StringVarP(
-		&genAppName, "app", "a", "", "the app for which you want to generate the Entity")
+		&genAppName, "service", "s", "", "the service for which you want to generate the Entity")
+
+	// TODO: uncomment this when you implement adding a base template to the test file
+	// genTestCmd := &cobra.Command{
+	// 	Use:   "test",
+	// 	Short: "Generate a new test for your controller",
+	// 	Run: func(cmd *cobra.Command, args []string) {
+	// 		if len(args) == 0 || len(args) < 2 {
+	// 			pkg.ErrorMsg("Entity generator requires you to specify Entity name and Entity data")
+	// 			return
+	// 		}
+
+	// 		err := genTest(args[0], genAppName)
+	// 		if err != nil {
+	// 			pkg.ErrorMsg(err.Error())
+	// 		}
+	// 	},
+	// }
+
+	// genTestCmd.Flags().StringVarP(
+	// 	&routerName, "router", "r", "", "the router for which controller test is to be written")
+
+	// genTestCmd.Flags().StringVarP(
+	// 	&genAppName, "service", "s", "", "the service for which test to be generated")
 
 	genCmd.AddCommand(genServiceCmd)
 	genCmd.AddCommand(genRouterCmd)
 	genCmd.AddCommand(genRouteCmd)
 	genCmd.AddCommand(genEntityCmd)
+	// genCmd.AddCommand(genTestCmd)
 
 	return genCmd
 }
@@ -614,6 +638,10 @@ func genEntity(en, app, data string) error {
 		return err
 	}
 
+	return nil
+}
+
+func genTest(testName, app string) error {
 	return nil
 }
 

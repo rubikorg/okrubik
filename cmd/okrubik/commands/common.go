@@ -64,7 +64,8 @@ func Execute() error {
 	rootCmd.AddCommand(initExecCmd())
 	rootCmd.AddCommand(initUpgradeCmd())
 	rootCmd.AddCommand(initTestCmd())
-	// rootCmd.AddCommand(initBundleCommand())
+	rootCmd.AddCommand(initDiceCommand())
+	rootCmd.AddCommand(initApiDocCommand())
 
 	return rootCmd.Execute()
 }
