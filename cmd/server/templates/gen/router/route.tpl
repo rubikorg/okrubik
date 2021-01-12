@@ -8,10 +8,9 @@ import (
 var Router = r.Create("/{{ .RouterName }}")
 
 func init() {
-	indexRoute = r.Route{
+	indexRoute := r.Route{
 		Path:       "/",
 		Controller: indexCtl,
 	}
-	
 	Router.Add(indexRoute)
 }
