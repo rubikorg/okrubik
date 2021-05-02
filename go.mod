@@ -4,8 +4,6 @@ go 1.14
 
 replace github.com/rubikorg/rubik v0.0.0 => ../ink
 
-replace github.com/rubikorg/dice v0.0.0 => ../dice
-
 replace github.com/rubikorg/blocks v0.0.0 => ../blocks
 
 require (
@@ -17,7 +15,6 @@ require (
 	github.com/printzero/tint v0.0.3
 	github.com/radovskyb/watcher v1.0.7
 	github.com/rubikorg/blocks v0.0.0
-	github.com/rubikorg/dice v0.0.0
 	github.com/rubikorg/rubik v0.0.0
 	github.com/spf13/cobra v1.0.0
 	go.mongodb.org/mongo-driver v1.4.4
