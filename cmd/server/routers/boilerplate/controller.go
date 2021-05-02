@@ -23,6 +23,7 @@ var createFiles = []string{
 var genRouterFiles = []string{
 	"route.tpl",
 	"controller.tpl",
+	"controller_test.tpl",
 }
 
 func createCtl(req *r.Request) {

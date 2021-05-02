@@ -17,8 +17,8 @@ var rubcl = rubik.NewClient(BaseAssetURL, time.Second*30)
 
 const (
 	// BaseAssetURL is the base url for getting files neede for okrubik
-	BaseAssetURL = "https://rubik.ashishshekar.com"
-	// BaseAssetURL = "http://localhost:7000"
+	// BaseAssetURL = "https://rubik.ashishshekar.com"
+	BaseAssetURL = "http://localhost:7000"
 
 	// GSFile is the getting started file path
 	GSFile = "/gs.zip"

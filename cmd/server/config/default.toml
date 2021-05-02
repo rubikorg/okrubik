@@ -15,7 +15,10 @@ name = "first3"
 allOrigins = true
 
 [swagger]
-title = "Rubik Server"
+title = "okrubik server"
 description = "This is the main server for Rubik and it's CLI tool. For `okrubik`!"
-version = "1.0.1"
+version = "0.2.6"
+
+[sdk_ts]
+out_dir = "./apigen/ts"
 # termsOfService = "http://www.apache.org/licenses/LICENSE-2.0.html"

@@ -9,22 +9,32 @@ Log = false
   path = "./cmd/okrubik"
   watch = false
   communicate = false
+  log = false
 
 [[app]]
   name = "server"
   path = "./cmd/server"
   watch = true
   communicate = false
+  log = false
+  [app.store]
+    dialect = "mongo"
+    protocol = "mongodb"
+    host = "localhost"
+    port = 27017
+    database = "riddler"
 
 [x]
+  [x.buildcli]
+    command = "go build -o . cmd/okrubik/main.go"
   [x.cli]
     command = "go run main.go"
     pwd = "cmd/okrubik"
   [x.debug]
     command = "go run main.go"
     pwd = "cmd/server"
-  [x.buildcli]
-    command = "go build -o . cmd/okrubik/main.go"
+  [x.foo]
+    command = "echo foo"
   [x.testcli]
     command = "go test -cover ./cmd/okrubik/..."
   [x.testsrv]

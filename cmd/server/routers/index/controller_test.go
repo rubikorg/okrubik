@@ -6,19 +6,21 @@ import (
 	"github.com/rubikorg/rubik"
 )
 
-var probe rubik.TestProbe
+var probe *rubik.TestProbe
 
 func init() {
 	probe = rubik.NewProbe(Router)
 }
 
 func TestIndexCtl(t *testing.T) {
-	_, rr := probe.Test("GET", "/", nil, nil, indexCtl)
-	if rr.Result().StatusCode != 200 {
-		t.Error("The status code for indexCtl is not 200:", rr.Body.String())
+	en := iEn{
+		Name: "ashish",
+		Age:  22,
 	}
-
-	if rr.Body.String() != "hello go" {
-		t.Errorf("Wrong response, curent resp: %s", rr.Body.String())
+	en.PointTo = "/"
+	rr := probe.Test(en)
+	resp := rr.Body.String()
+	if resp != "hello: ashish of age: 22" {
+		t.Error("Response")
 	}
 }

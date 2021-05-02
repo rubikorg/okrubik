@@ -152,12 +152,25 @@ func run(basePath string) error {
 
 		basePath = strings.Replace(lookup[answer].Path, "./", pwd+string(os.PathSeparator), 1)
 
+		fmt.Println(lookup[answer])
+
 		if lookup[answer].Watchable {
 			go runServer(basePath)
 			startWatcher(w, basePath)
+		} else if lookup[answer].RunCommand != "" {
+			os.Chdir(basePath)
+			customCmd := strings.Split(lookup[answer].RunCommand, " ")
+			cmd = exec.Command(customCmd[0], customCmd[1:]...)
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.SysProcAttr = &syscall.SysProcAttr{
+				Setpgid: true,
+			}
+			cmd.Run()
 		} else {
 			runServer(basePath)
 		}
+
 	} else {
 		go runServer(basePath)
 		startWatcher(w, basePath)
