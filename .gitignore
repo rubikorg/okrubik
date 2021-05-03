@@ -12,3 +12,7 @@ releases/
 # target/ folder for final zip releases
 target/
 dice.yaml
+
+
+# test for apigen
+bindings/

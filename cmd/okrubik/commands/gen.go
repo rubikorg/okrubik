@@ -256,7 +256,7 @@ func addRouterToAST(path, routerName string, proj pkg.Project) error {
 		return errors.New("Not a rubik project. Cannot find rubik.toml")
 	}
 
-	var config pkg.Config
+	var config pkg.WorkspaceConfig
 	_, err := toml.DecodeFile(rubikToml, &config)
 	if err != nil {
 		return err
@@ -319,7 +319,7 @@ func genBin(name, port string) error {
 		return errors.New("Not a rubik project. Cannot find rubik.toml")
 	}
 
-	var config pkg.Config
+	var config pkg.WorkspaceConfig
 	_, err := toml.DecodeFile(rubikToml, &config)
 	if err != nil {
 		return err
@@ -471,7 +471,11 @@ func addRouteToAST(routeFilePath, rrouteName string) error {
 		return err
 	}
 
-	rconf := pkg.GetRubikConfig()
+	rconf, err := pkg.GetRubikConfig()
+	if err != nil {
+		return err
+	}
+
 	importStmt := fmt.Sprintf("%s/pkg/entity", rconf.Module)
 	astutil.AddImport(fset, node, importStmt)
 
@@ -594,7 +598,11 @@ func genEntity(en, app, data string) error {
 			return err
 		}
 	} else {
-		config := pkg.GetRubikConfig()
+		config, err := pkg.GetRubikConfig()
+		if err != nil {
+			return err
+		}
+
 		if config.Module == "" {
 			return errors.New("not a valid Rubik project")
 		}

@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,9 +22,15 @@ func initTestCmd() *cobra.Command {
 		Aliases: []string{"t"},
 		Run: func(cmd *cobra.Command, args []string) {
 			if allFlag {
-				runAllTests()
+				err := runAllTests()
+				if err != nil {
+					pkg.ErrorMsg(err.Error())
+				}
 			} else if specificService != "" {
-				runTestsForSpecificService()
+				err := runTestsForSpecificService()
+				if err != nil {
+					pkg.ErrorMsg(err.Error())
+				}
 			}
 		},
 	}
@@ -35,8 +42,12 @@ func initTestCmd() *cobra.Command {
 	return &testCmd
 }
 
-func runAllTests() {
-	rconf := pkg.GetRubikConfig()
+func runAllTests() error {
+	rconf, err := pkg.GetRubikConfig()
+	if err != nil {
+		return err
+	}
+
 	for _, service := range rconf.App {
 		pkg.EmojiMsg("🚀", service.Name)
 		servicePath := filepath.Join(service.Path, "...")
@@ -45,10 +56,15 @@ func runAllTests() {
 		cmd.Stderr = os.Stderr
 		cmd.Run()
 	}
+
+	return nil
 }
 
-func runTestsForSpecificService() {
-	rconf := pkg.GetRubikConfig()
+func runTestsForSpecificService() error {
+	rconf, err := pkg.GetRubikConfig()
+	if err != nil {
+		return err
+	}
 	var proj pkg.Project
 	for _, service := range rconf.App {
 		if service.Name == specificService {
@@ -57,8 +73,7 @@ func runTestsForSpecificService() {
 	}
 
 	if proj.Name == "" {
-		pkg.ErrorMsg("No such service")
-		return
+		return errors.New("No such service")
 	}
 
 	pkg.EmojiMsg("🚀", proj.Name)
@@ -67,4 +82,6 @@ func runTestsForSpecificService() {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
+
+	return nil
 }

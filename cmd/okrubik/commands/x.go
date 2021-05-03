@@ -34,7 +34,7 @@ func initExecCmd() *cobra.Command {
 
 // x executes the `okrubik x:test` commands
 func x(arg string) error {
-	var rubikConf pkg.Config
+	var rubikConf pkg.WorkspaceConfig
 	tomlPath := filepath.Join(".", "rubik.toml")
 	if f, _ := os.Stat(tomlPath); f == nil {
 		return errors.New("not a Rubik workspace")

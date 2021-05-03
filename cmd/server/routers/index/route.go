@@ -2,9 +2,7 @@ package index
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/rubikorg/okrubik/pkg/entity"
 	r "github.com/rubikorg/rubik"
 )
 
@@ -61,24 +59,6 @@ func init() {
 		Controller: getTokenCtl,
 	}
 	Router.Add(getTokenRoute)
-
-	someRoute := r.Route{
-		Method:     http.MethodPost,
-		Path:       "/some",
-		Controller: someCtl,
-	}
-	Router.Add(someRoute)
-	facebookRoute := r.Route{
-		Path:       "/facebook",
-		Controller: facebookCtl,
-	}
-	Router.Add(facebookRoute)
-	addSaltRoute := r.Route{
-		Path:       "/addSalt",
-		Entity:     entity.AddSaltEntity{},
-		Controller: addSaltCtl,
-	}
-	Router.Add(addSaltRoute)
 
 	// Router.StorageRoutes("gs.zip")
 }

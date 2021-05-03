@@ -17,7 +17,11 @@ func Project() (string, error) {
 }
 
 func RawProject() (pkg.Project, error) {
-	cfg := pkg.GetRubikConfig()
+	cfg, err := pkg.GetRubikConfig()
+	if err != nil {
+		return pkg.Project{}, err
+	}
+
 	if cfg.ProjectName == "" {
 		return pkg.Project{}, errors.New("not a valid rubik config")
 	}

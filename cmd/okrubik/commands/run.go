@@ -74,7 +74,11 @@ func initRunCmd() *cobra.Command {
 // run is a function for running an app from the rubik.toml file
 func run(basePath string) error {
 	pwd, _ := os.Getwd()
-	cfg := pkg.GetRubikConfig()
+	cfg, err := pkg.GetRubikConfig()
+	if err != nil {
+		return err
+	}
+
 	if cfg.ProjectName == "" {
 		return errors.New("not a valid rubik config")
 	}
@@ -219,7 +223,11 @@ func runPlugins() error {
 			return err
 		}
 	} else {
-		cfg := pkg.GetRubikConfig()
+		cfg, err := pkg.GetRubikConfig()
+		if err != nil {
+			return err
+		}
+
 		if cfg.ProjectName == "" {
 			return errors.New("not a valid rubik config")
 		}
