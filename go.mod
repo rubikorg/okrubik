@@ -2,9 +2,6 @@ module github.com/rubikorg/okrubik
 
 go 1.14
 
-replace github.com/rubikorg/rubik v0.0.0 => ../ink
-
-replace github.com/rubikorg/blocks v0.0.0 => ../blocks
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.0.7
