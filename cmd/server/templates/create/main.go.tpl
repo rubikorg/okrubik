@@ -3,6 +3,7 @@ package main
 import (
 	"{{ .ModulePath }}/cmd/{{ .Bin }}/app"
 	"{{ .ModulePath }}/cmd/{{ .Bin }}/routers"
+	"{{ .ModulePath }}/pkg/services"
 	r "github.com/rubikorg/rubik"
 )
 
@@ -21,7 +22,7 @@ func main() {
 	})
 
 	routers.Import()
-	if err := r.Run(); err != nil {
+	if err := r.Run(services.{{ .CapBin }}Service); err != nil {
 		panic(err)
 	}
 }

@@ -38,10 +38,16 @@ func initNewCmd() *cobra.Command {
 				pkg.ErrorMsg("new command requires a project name")
 				return
 			}
+
+			newServiceName := "server"
 			err = create(entity.CreateBoilerplateEntity{
 				Name:       args[0],
 				ModulePath: args[0],
-				Port:       "7000"})
+				Port:       "7000",
+				IsNew:      true,
+				Bin:        newServiceName,
+				CapBin:     capitalize(newServiceName),
+			})
 			if err != nil {
 				pkg.ErrorMsg(err.Error())
 			}
@@ -62,11 +68,6 @@ func initNewCmd() *cobra.Command {
 func create(inp entity.CreateBoilerplateEntity) error {
 	// ask necessary questions
 	var err error
-	inp.Bin = "server"
-	if err != nil {
-		return err
-	}
-
 	var files map[string]string
 	inp.PointTo = "/boilerplate/create"
 	inp.Infer = &files
@@ -139,8 +140,8 @@ func runTidyCommand(name string) {
 }
 
 func creationOutput(typ, path string) {
-	msg := fmt.Sprintf("@( %s ) %s", typ, path)
-	op := t.Exp(msg, tint.BgGreen.Add(tint.White.Bold()))
+	msg := fmt.Sprintf("	@( %s ) => %s", typ, path)
+	op := t.Exp(msg, tint.Green.Bold())
 	fmt.Println(op)
 }
 

@@ -3,22 +3,9 @@ package boilerplate
 import (
 	"path/filepath"
 
+	"github.com/rubikorg/okrubik/pkg/entity"
 	r "github.com/rubikorg/rubik"
 )
-
-var createFiles = []string{
-	"app-config.go.tpl",
-	"app-dep.go.tpl",
-	"routers-index-controller.go.tpl",
-	"main.go.tpl",
-	"rubik.toml.tpl",
-	"templates-index.html.tpl",
-	"config-default.toml.tpl",
-	"routers-index-route.go.tpl",
-	"routers-import.go.tpl",
-	"static-main.css.tpl",
-	"README.md.tpl",
-}
 
 var genRouterFiles = []string{
 	"route.tpl",
@@ -27,10 +14,30 @@ var genRouterFiles = []string{
 }
 
 func createCtl(req *r.Request) {
+	createFiles := []string{
+		"app-config.go.tpl",
+		"app-dep.go.tpl",
+		"routers-index-controller.go.tpl",
+		"main.go.tpl",
+		"rubik.toml.tpl",
+		"templates-index.html.tpl",
+		"config-default.toml.tpl",
+		"routers-index-route.go.tpl",
+		"routers-import.go.tpl",
+		"static-main.css.tpl",
+		"README.md.tpl",
+	}
 	var compiled = make(map[string]string)
+
+	createEn := req.Entity.(*entity.CreateBoilerplateEntity)
+	// if it is a new workspace create this file for user
+	if createEn.IsNew {
+		createFiles = append(createFiles, "pkg-services-list.go.tpl")
+	}
+
 	for _, file := range createFiles {
 		joinedPath := filepath.Join("create", file)
-		result := r.RenderContent(r.Type.Text, req.Entity, joinedPath).Data
+		result := r.RenderContent(r.Type.Text, createEn, joinedPath).Data
 		b, _ := result.([]byte)
 		compiled[file] = string(b)
 	}

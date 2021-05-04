@@ -27,13 +27,14 @@ import (
 )
 
 var (
-	binName     string
-	binPort     string
-	routerName  string
-	routeName   string
-	entityName  string
-	genAppName  string
-	writeEntity bool
+	binName        string
+	binPort        string
+	routerName     string
+	routeName      string
+	entityName     string
+	genAppName     string
+	writeEntity    bool
+	testServiceAST bool
 )
 
 // ControllerTestTemplate is used to generate a test function
@@ -115,10 +116,15 @@ func initGenCmd() *cobra.Command {
 		Use:   "service",
 		Short: "Generate service binary inside this Rubik workspace",
 		Run: func(cmd *cobra.Command, args []string) {
-			err := genBin(binName, binPort)
-			if err != nil {
-				pkg.ErrorMsg(err.Error())
+			if testServiceAST {
+				addToServicesAST()
+			} else {
+				err := genBin(binName, binPort)
+				if err != nil {
+					pkg.ErrorMsg(err.Error())
+				}
 			}
+
 		},
 	}
 
@@ -128,6 +134,7 @@ func initGenCmd() *cobra.Command {
 		&binPort, "port", "p", "", "the port of the server you want to generate")
 	genServiceCmd.MarkFlagRequired("name")
 	genServiceCmd.MarkFlagRequired("port")
+	genServiceCmd.Flags().BoolVarP(&testServiceAST, "test", "t", false, "Yo")
 
 	genRouteCmd := &cobra.Command{
 		Use:   "route",
@@ -340,6 +347,8 @@ func genBin(name, port string) error {
 		ModulePath: config.Module,
 		Port:       port,
 		Bin:        name,
+		CapBin:     capitalize(name),
+		IsNew:      false,
 	}
 	cbe.PointTo = "/boilerplate/create"
 	cbe.Infer = &files
@@ -371,6 +380,9 @@ func genBin(name, port string) error {
 		}
 	}
 
+	creationOutput("edit", "pkg/services")
+	addToServicesAST()
+
 	runTidyCommand(name)
 
 	creationOutput("configuring", rubikToml)
@@ -385,6 +397,52 @@ func genBin(name, port string) error {
 		return err
 	}
 
+	return nil
+}
+
+func addToServicesAST() error {
+	fset := token.NewFileSet()
+	filePath := filepath.Join(".", "pkg", "services", "list.go")
+	node, err := parser.ParseFile(fset, filePath, nil, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+
+	for _, f := range node.Decls {
+		if gendecl, ok := f.(*ast.GenDecl); ok {
+			// for _, spec := range gendecl.Specs {
+			// 	for _, val := range spec.(*ast.ValueSpec).Values {
+			// 		fmt.Printf("%#v", val)
+			// 	}
+			// }
+			ident := []*ast.Ident{
+				{
+					Name: fmt.Sprintf("%sService", capitalize(binName)),
+				},
+			}
+			gendecl.Specs = append(gendecl.Specs, &ast.ValueSpec{
+				Names: ident,
+				Values: []ast.Expr{
+					&ast.BasicLit{
+						Kind:  token.STRING,
+						Value: fmt.Sprintf("\"%s\"", binName),
+					},
+				},
+			})
+		}
+	}
+
+	var buf bytes.Buffer
+	err = printer.Fprint(&buf, fset, node)
+	if err != nil {
+		return err
+	}
+
+	formatted, err := format.Source(buf.Bytes())
+	err = ioutil.WriteFile(filePath, formatted, 0755)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
