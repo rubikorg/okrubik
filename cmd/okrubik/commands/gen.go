@@ -27,14 +27,13 @@ import (
 )
 
 var (
-	binName        string
-	binPort        string
-	routerName     string
-	routeName      string
-	entityName     string
-	genAppName     string
-	writeEntity    bool
-	testServiceAST bool
+	binName     string
+	binPort     string
+	routerName  string
+	routeName   string
+	entityName  string
+	genAppName  string
+	writeEntity bool
 )
 
 // ControllerTestTemplate is used to generate a test function
@@ -116,15 +115,10 @@ func initGenCmd() *cobra.Command {
 		Use:   "service",
 		Short: "Generate service binary inside this Rubik workspace",
 		Run: func(cmd *cobra.Command, args []string) {
-			if testServiceAST {
-				addToServicesAST()
-			} else {
-				err := genBin(binName, binPort)
-				if err != nil {
-					pkg.ErrorMsg(err.Error())
-				}
+			err := genBin(binName, binPort)
+			if err != nil {
+				pkg.ErrorMsg(err.Error())
 			}
-
 		},
 	}
 
@@ -134,7 +128,6 @@ func initGenCmd() *cobra.Command {
 		&binPort, "port", "p", "", "the port of the server you want to generate")
 	genServiceCmd.MarkFlagRequired("name")
 	genServiceCmd.MarkFlagRequired("port")
-	genServiceCmd.Flags().BoolVarP(&testServiceAST, "test", "t", false, "Yo")
 
 	genRouteCmd := &cobra.Command{
 		Use:   "route",
