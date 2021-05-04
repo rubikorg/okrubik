@@ -140,7 +140,7 @@ func runTidyCommand(name string) {
 }
 
 func creationOutput(typ, path string) {
-	msg := fmt.Sprintf("	@( %s ) => %s", typ, path)
+	msg := fmt.Sprintf("@( %s ) => %s", typ, path)
 	op := t.Exp(msg, tint.Green.Bold())
 	fmt.Println(op)
 }
