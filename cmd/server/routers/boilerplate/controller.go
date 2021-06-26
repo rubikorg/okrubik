@@ -2,6 +2,7 @@ package boilerplate
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/rubikorg/okrubik/pkg/entity"
 	r "github.com/rubikorg/rubik"
@@ -19,24 +20,28 @@ func createCtl(req *r.Request) {
 		"app-dep.go.tpl",
 		"routers-index-controller.go.tpl",
 		"main.go.tpl",
-		"rubik.toml.tpl",
+		"#rubik.toml.tpl",
 		"templates-index.html.tpl",
 		"config-default.toml.tpl",
 		"routers-index-route.go.tpl",
 		"routers-import.go.tpl",
 		"static-main.css.tpl",
-		"README.md.tpl",
+		"#README.md.tpl",
 	}
 	var compiled = make(map[string]string)
 
 	createEn := req.Entity.(*entity.CreateBoilerplateEntity)
 	// if it is a new workspace create this file for user
 	if createEn.IsNew {
-		createFiles = append(createFiles, "pkg-services-list.go.tpl")
+		createFiles = append(createFiles, "#pkg-services-list.go.tpl")
 	}
 
 	for _, file := range createFiles {
-		joinedPath := filepath.Join("create", file)
+		var cleanFileName = file
+		if strings.HasPrefix(file, "#") {
+			cleanFileName = strings.ReplaceAll(file, "#", "")
+		}
+		joinedPath := filepath.Join("create", cleanFileName)
 		result := r.RenderContent(r.Type.Text, createEn, joinedPath).Data
 		b, _ := result.([]byte)
 		compiled[file] = string(b)

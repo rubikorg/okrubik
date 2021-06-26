@@ -85,11 +85,16 @@ func create(inp entity.CreateBoilerplateEntity) error {
 	}
 
 	os.MkdirAll(basePath, 0755)
-	rootFiles := []string{"rubik.toml", "README.md"}
 	for name, content := range files {
+		cleanName := name
+		hasRootPrefix := strings.HasPrefix(name, "#")
+		if hasRootPrefix {
+			cleanName = strings.ReplaceAll(name, "#", "")
+		}
+
 		var truePath string
-		namePath := strings.Split(name, "-")
-		if in(name, rootFiles) {
+		namePath := strings.Split(cleanName, "-")
+		if hasRootPrefix {
 			truePath = filepath.Join(".", inp.Name)
 		} else {
 			truePath = basePath

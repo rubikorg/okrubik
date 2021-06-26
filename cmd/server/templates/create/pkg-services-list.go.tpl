@@ -1,5 +1,5 @@
 package services
 
 const (
-    CoreService = "server"
+    ServerService = "server"
 )

@@ -156,8 +156,6 @@ func run(basePath string) error {
 
 		basePath = strings.Replace(lookup[answer].Path, "./", pwd+string(os.PathSeparator), 1)
 
-		fmt.Println(lookup[answer])
-
 		if lookup[answer].Watchable {
 			go runServer(basePath)
 			startWatcher(w, basePath)
